@@ -1,0 +1,1 @@
+cmd.exe /k g++ main.cpp glad.c -o main -I C:\Users\xsocc\Downloads\cpp-opengl-20220125T230530Z-001\cpp-opengl\include -L C:\Users\xsocc\Downloads\cpp-opengl-20220125T230530Z-001\cpp-opengl\lib -lglfw3dll -lopengl32
