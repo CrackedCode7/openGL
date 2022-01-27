@@ -19,6 +19,8 @@
 
 #include <iostream>
 
+#include "Shader.h"
+
 
 // Constant settings
 // -----------------------------------------------------------------------------
@@ -129,7 +131,7 @@ int main()
 	glCompileShader(fragmentShader);
 	// Error checking
 	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+	//glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
 	if (!success)
 	{
 		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
