@@ -1,5 +1,9 @@
 #include <glad/glad.h> // Include glad to get OpenGL headers
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -100,21 +104,28 @@ void Shader::use()
 
 
 // setBool function definition
-void setBool(const std::string &name, bool value) const
+void Shader::setBool(const std::string &name, bool value) const
 {
 	glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
 }
 
 
 // setInt function definition
-void setInt(const std::string &name, int value) const
+void Shader::setInt(const std::string &name, int value) const
 {
 	glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
 }
 
 
 // setFloat function definition
-void setFloat(const std::string &name, float value) const
+void Shader::setFloat(const std::string &name, float value) const
 {
 	glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
+}
+
+
+// setMat4 function defintion
+void Shader::setMat4(const std::string &name, glm::mat4 value) const
+{
+	glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
 }
