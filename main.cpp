@@ -1,5 +1,22 @@
-#include <glad/glad.h> // before glfw (I think)
+/* -----------------------------------------------------------------------------
+	In this version I add a uniform to the vertex shader to allow us to pass in
+	a transformation matrix (mat4 type). The gl_Position attribute uses this
+	uniform to transform input vertices.
+
+	We set the uniform value in the while loop. (I think attributes set before render loop,
+	and uniforms can be set once the program is in use)
+
+	GLM is used for the matrix math, and was added to the include folder.
+   ----------------------------------------------------------------------------- */
+
+
+#include <glad/glad.h> // before glfw (I think it HAS to be)
 #include <GLFW/glfw3.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <iostream>
 
 
@@ -34,9 +51,10 @@ const char* vertexShaderSource = "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
 	"layout (location = 1) in vec3 aColor;\n"
 	"out vec3 ourColor;\n"
+	"uniform mat4 transform;"
     "void main()\n"
     "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "   gl_Position = transform * vec4(aPos, 1.0f);\n"
 	"	ourColor = aColor;"
     "}\0";
 const char *fragmentShaderSource = "#version 330 core\n"
@@ -184,6 +202,13 @@ int main()
 		// Draw triangle
 		glUseProgram(shaderProgram);
 		glBindVertexArray(VAO);
+		// Transformation uniform in vertex shader setup
+		glm::mat4 trans = glm::mat4(1.0f);
+		//trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+		trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+		unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
+		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+		
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 
