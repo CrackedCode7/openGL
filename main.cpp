@@ -24,8 +24,8 @@
 
 // Constant settings
 // -----------------------------------------------------------------------------
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 200;
+const unsigned int SCR_HEIGHT = 150;
 
 
 // Whenever the window size changes this callback is executed
@@ -95,21 +95,22 @@ int main()
 	// Set up vertex data, vertex buffers, vertex arrays
 	// -----------------------------------------------------------------------------
 	float vertices[] = {
-        -1.0f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-         -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-         0.0f,  -0.5f, 0.0f, 0.0f, 0.0f, 1.0f
+        -0.5f, -0.5f, -5.0f, 1.0f, 0.0f, 0.0f,
+         0.0f, 0.5f, -5.0f, 0.0f, 1.0f, 0.0f,
+         0.5f,  -0.5f, -5.0f, 0.0f, 0.0f, 1.0f
 	};
-
 
 	unsigned int VBO, VAO;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
-	// Bind the VAO first, then bind and set VBO(s), then configure vertix attribute(s)
+	// Bind the VAO first, then bind and set VBO(s), then configure vertex attribute(s)
 	glBindVertexArray(VAO);
-
+	//Bind VBO and set up buffer data (vertices in this case)
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
+	
+	// Since the VBO is bound above, these vertex attributes being set are
+	// for the currently bound buffer.
 	// position attribute
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
@@ -117,10 +118,30 @@ int main()
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
-	// Unbind
+	// Unbind. Since VBO now unbound, we cannot set up vertex attributes.
+	// A VAO and VBO MUST be bound to use glVertexAttribPointer
+	// The VAO must be re-bound before drawing, and the shader activated
+	// for calls like glDrawArrays to work.
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
-
+	
+	
+	// Set up initial camera position, look at, and up vectors
+	// Set up perspective projection, view, and model matrices
+	// -----------------------------------------------------------------------------
+	// Camera, look at, up vectors
+	glm::vec3 camera_pos = glm::vec3(0.0f, 0.0f, 10.0f);
+	glm::vec3 look_at = glm::vec3(0.0f, 0.0f, -5.0f);
+	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+	// Projection matrix
+	glm::mat4 projection;
+	projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH/(float)SCR_HEIGHT, 0.1f, 100.0f);
+	// View matrix (using glm::lookAt)
+	glm::mat4 view;
+	view = glm::lookAt(camera_pos, look_at, up);
+	// Model matrix (identity in this case)
+	glm::mat4 model = glm::mat4(1.0f);
+	
 	
 	// Render loop
 	// -----------------------------------------------------------------------------
@@ -136,15 +157,16 @@ int main()
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-	
 		// New way to draw triangles using shader class
 		ourShader.use();
+		// First have to bind vertex array object to tell the shader what 
+		// the vertex attributes look like
 		glBindVertexArray(VAO);
-		// Transformation uniform in vertex shader setup
-		glm::mat4 trans = glm::mat4(1.0f);
-		//trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-		trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-		ourShader.setMat4("transform", trans);
+		// Setup uniforms in vertex shader
+		ourShader.setMat4("model", model);
+		ourShader.setMat4("view", view);
+		ourShader.setMat4("projection", projection);
+		// Draw
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 
@@ -159,7 +181,6 @@ int main()
 	// -----------------------------------------------------------------------------
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
-	//glDeleteProgram(shaderProgram);
 	
 
 	// Terminate glfw before the program ends
