@@ -18,14 +18,16 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
+#include <vector>
 
 #include "Shader.h"
+#include "Cube.h"
 
 
 // Constant settings
 // -----------------------------------------------------------------------------
-const unsigned int SCR_WIDTH = 200;
-const unsigned int SCR_HEIGHT = 150;
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 800;
 
 
 // Whenever the window size changes this callback is executed
@@ -44,6 +46,27 @@ void processInput(GLFWwindow* window)
 	// Close window if ESC pressed
 	if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+
+	// W key
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	{
+		std::cout << "pressed W" << std::endl;
+	}
+	// A key
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	{
+		std::cout << "pressed A" << std::endl;
+	}
+	// S key
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+	{
+		std::cout << "pressed S" << std::endl;
+	}
+	// D key
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	{
+		std::cout << "pressed D" << std::endl;
+	}
 }
 
 
@@ -94,29 +117,70 @@ int main()
 
 	// Set up vertex data, vertex buffers, vertex arrays
 	// -----------------------------------------------------------------------------
-	float vertices[] = {
-        -0.5f, -0.5f, -5.0f, 1.0f, 0.0f, 0.0f,
-         0.0f, 0.5f, -5.0f, 0.0f, 1.0f, 0.0f,
-         0.5f,  -0.5f, -5.0f, 0.0f, 0.0f, 1.0f
+	Cube cube = Cube(0, 0, 0);
+	std::vector<float> colors = {
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f
 	};
 
-	unsigned int VBO, VAO;
+	// Generate Arrays and Buffers
+	unsigned int VBO1, VBO2, VAO, EBO;
 	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &VBO1);
+	glGenBuffers(1, &VBO2);
+	glGenBuffers(1, &EBO);
+
 	// Bind the VAO first, then bind and set VBO(s), then configure vertex attribute(s)
 	glBindVertexArray(VAO);
-	//Bind VBO and set up buffer data (vertices in this case)
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	
-	// Since the VBO is bound above, these vertex attributes being set are
-	// for the currently bound buffer.
-	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+
+	// Bind VBO and EBO and set up buffer data (vertices in this case)
+	glBindBuffer(GL_ARRAY_BUFFER, VBO1);
+	glBufferData(GL_ARRAY_BUFFER, cube.vertices.size() * sizeof(float), &cube.vertices[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, cube.indices.size() * sizeof(unsigned int), &cube.indices[0], GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(unsigned int), (void*)0);
 	glEnableVertexAttribArray(0);
+	
 	// color attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glBindBuffer(GL_ARRAY_BUFFER, VBO2);
+	glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), &colors[0], GL_STATIC_DRAW);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(1);
+	
 
 	// Unbind. Since VBO now unbound, we cannot set up vertex attributes.
 	// A VAO and VBO MUST be bound to use glVertexAttribPointer
@@ -130,8 +194,8 @@ int main()
 	// Set up perspective projection, view, and model matrices
 	// -----------------------------------------------------------------------------
 	// Camera, look at, up vectors
-	glm::vec3 camera_pos = glm::vec3(0.0f, 0.0f, 10.0f);
-	glm::vec3 look_at = glm::vec3(0.0f, 0.0f, -5.0f);
+	glm::vec3 camera_pos = glm::vec3(0.0f, 0.0f, 5.0f);
+	glm::vec3 look_at = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 	// Projection matrix
 	glm::mat4 projection;
@@ -142,7 +206,15 @@ int main()
 	// Model matrix (identity in this case)
 	glm::mat4 model = glm::mat4(1.0f);
 	
+
+	// OpenGL setup functions
+	// -----------------------------------------------------------------------------
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
 	
+
 	// Render loop
 	// -----------------------------------------------------------------------------
 	while (!glfwWindowShouldClose(window))
@@ -155,8 +227,9 @@ int main()
 		// render
 		// ----------
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		// Wireframe mode
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		// New way to draw triangles using shader class
 		ourShader.use();
 		// First have to bind vertex array object to tell the shader what 
@@ -166,8 +239,9 @@ int main()
 		ourShader.setMat4("model", model);
 		ourShader.setMat4("view", view);
 		ourShader.setMat4("projection", projection);
-		// Draw
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		// Draw (now with indexed vertices)
+		//glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -180,7 +254,8 @@ int main()
 	// Optionally de-allocate resources
 	// -----------------------------------------------------------------------------
 	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &VBO1);
+	glDeleteBuffers(1, &VBO2);
 	
 
 	// Terminate glfw before the program ends
