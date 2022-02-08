@@ -1,12 +1,7 @@
 /* -----------------------------------------------------------------------------
-	In this version I add a uniform to the vertex shader to allow us to pass in
-	a transformation matrix (mat4 type). The gl_Position attribute uses this
-	uniform to transform input vertices.
-
-	We set the uniform value in the while loop. (I think attributes set before render loop,
-	and uniforms can be set once the program is in use)
-
-	GLM is used for the matrix math, and was added to the include folder.
+	In this version I add a ticking system to the mix. I moved the process input
+	code to the ticking function so input (movement in this case) only processes
+	at 60 fps. I also added up/down movement.
    ----------------------------------------------------------------------------- */
 
 
@@ -20,6 +15,7 @@
 
 #include <iostream>
 #include <vector>
+#include <cmath> // floor
 
 #include "Shader.h"
 #include "Cube.h"
@@ -27,13 +23,13 @@
 
 
 // Constant settings
-// -----------------------------------------------------------------------------
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 800;
+// ---------------------------------------------------------------------------------
+const unsigned int SCR_WIDTH = 300;
+const unsigned int SCR_HEIGHT = 300;
 
 
 // Whenever the window size changes this callback is executed
-// -----------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	// Resize viewport to match new window size
@@ -42,48 +38,91 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 
 // Function to query from GLFW whether keys were pressed, etc.
-// -----------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
 void processInput(GLFWwindow* window, Camera& camera)
 {
 	// Close window if ESC pressed
+	// -----------------------------------------------------------------------------
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 	
-
+	
+	// Check movement keys (WASD, LCTRL, SPACE)
+	// -----------------------------------------------------------------------------
 	// bool to decide whether we need to re-calculate matrices
-	bool recalulate = false;
+	bool recalculate = false;
 
 	// W key
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
 		camera.setCameraPos(camera.cameraPos - 0.1f * camera.cameraDirection);
 		camera.setCameraTarget(camera.cameraTarget - 0.1f * camera.cameraDirection);
-		recalulate = true;
+		recalculate = true;
 	}
 	// A key
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
-		camera.setCameraPos(camera.cameraPos + 0.1f * camera.cameraRight);
-		camera.setCameraTarget(camera.cameraTarget + 0.1f * camera.cameraRight);
-		recalulate = true;
+		camera.setCameraPos(camera.cameraPos - 0.1f * camera.cameraRight);
+		camera.setCameraTarget(camera.cameraTarget - 0.1f * camera.cameraRight);
+		recalculate = true;
 	}
 	// S key
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
 		camera.setCameraPos(camera.cameraPos + 0.1f * camera.cameraDirection);
 		camera.setCameraTarget(camera.cameraTarget + 0.1f * camera.cameraDirection);
-		recalulate = true;
+		recalculate = true;
 	}
 	// D key
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
-		camera.setCameraPos(camera.cameraPos - 0.1f * camera.cameraRight);
-		camera.setCameraTarget(camera.cameraTarget - 0.1f * camera.cameraRight);
-		recalulate = true;
+		camera.setCameraPos(camera.cameraPos + 0.1f * camera.cameraRight);
+		camera.setCameraTarget(camera.cameraTarget + 0.1f * camera.cameraRight);
+		recalculate = true;
 	}
+	// Space bar
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+	{
+		camera.setCameraPos(camera.cameraPos + 0.1f * camera.up);
+		camera.setCameraTarget(camera.cameraTarget + 0.1f * camera.up);
+		recalculate = true;
+	}
+	// Left control
+	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+	{
+		camera.setCameraPos(camera.cameraPos - 0.1f * camera.up);
+		camera.setCameraTarget(camera.cameraTarget - 0.1f * camera.up);
+		recalculate = true;
+	}
+	
+	
+	// Check for rotation
+	// -----------------------------------------------------------------------------
+	
+	// Check mouse position
+	double xpos, ypos;
+	glfwGetCursorPos(window, &xpos, &ypos);
+	// Get window size (in case we resized)
+	int width, height;
+	glfwGetWindowSize(window, &width, &height);
+	
+	// Check whether cursor no longer in center (need to rotate)
+	if (floor(xpos) != floor(width/2.0))
+	{
+		std::cout << "x: " << xpos-width/2.0 << std::endl;
+	}
+	if (floor(ypos) != floor(height/2.0))
+	{
+		std::cout << "y: " << ypos-height/2.0 << std::endl;
+	}
+	
+	// Set cursor back to middle of window
+	glfwSetCursorPos(window, width/2.0, height/2.0);
+
 
 	// Re-calculate camera matrices if required
-	if (recalulate)
+	// -----------------------------------------------------------------------------
+	if (recalculate)
 	{
 		camera.recalculateMatrices();
 	}
@@ -118,8 +157,10 @@ int main()
         return -1;
     }
 	glfwMakeContextCurrent(window); // Make new window current
-	//glfwSwapInterval(0); // No V-sync
+	glfwSwapInterval(0); // No V-sync
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+	glfwSetCursorPos(window, SCR_WIDTH/2.0, SCR_HEIGHT/2.0); // cursor in middle
 	
 
 	// Initialize GLAD
@@ -228,15 +269,45 @@ int main()
 	// -----------------------------------------------------------------------------
 	// Framerate variables
 	double previousTime = glfwGetTime();
+	double previousTickTime = glfwGetTime();
+	double tickTime = 1.0/60.0;
 	int frameCount = 0;
+	int tickCount = 0;
 
 	// Main loop
 	while (!glfwWindowShouldClose(window))
     {
-        // input
+		// Framerate counting/displaying
 		// -------------------------------------------------------------------------
-        processInput(window, camera);
+		double currentTime = glfwGetTime();
+		
+		// Increment number of frames
+		frameCount++;
+		
+		// Output frames and ticks once per second
+		if (currentTime - previousTime >= 1.0)
+		{
+			std::cout << frameCount << " fps" << std::endl;
+			std::cout << tickCount << " ticks\n" << std::endl;
 
+			frameCount = 0;
+			tickCount = 0;
+			previousTime = currentTime;
+		}
+		
+		// Ticking system
+		// -------------------------------------------------------------------------
+		// Try to tick 60 times per second
+		if (currentTime - previousTickTime >= tickTime)
+		{
+			// input
+			// ---------------------------------------------------------------------
+			processInput(window, camera);
+			
+			tickCount++;
+			previousTickTime = currentTime;
+		}
+		
 
 		// render
 		// -------------------------------------------------------------------------
@@ -261,17 +332,6 @@ int main()
 		// -------------------------------------------------------------------------
         glfwSwapBuffers(window);
         glfwPollEvents();
-
-		// Framerate counting/displaying
-		double currentTime = glfwGetTime();
-		frameCount++;
-		if (currentTime - previousTime >= 1.0)
-		{
-			std::cout << frameCount << std::endl;
-
-			frameCount = 0;
-			previousTime = currentTime;
-		}
     }
 
 

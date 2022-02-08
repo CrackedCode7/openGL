@@ -1,8 +1,9 @@
 Current item(s) to work on:
-    - Ticking system to limit movement speed, while rendering still at higher fps
+    - Camera rotation
     - Look into coloring different faces different colors. Specifically, how does the coloring work when we have
       an EBO with indics for the vertices, then a regular VBO for the colors? Maybe I should set up an EBO
       for the colors so that we can control the color of each vertex (I think this makes sense).
+	- Textures (testing, so I need to try to set half of a face to some color, etc.)
 
 
 Current method of polling for events can miss events. Need to switch the input handling to a callback in the future.
