@@ -1,1 +1,1 @@
-cmd.exe /k g++ main.cpp Shader.cpp Cube.cpp glad.c -o main -I include -L lib -lglfw3dll -lopengl32
+cmd.exe /k g++ main.cpp Shader.cpp Cube.cpp Camera.cpp glad.c -o main -I include -L lib -lglfw3dll -lopengl32

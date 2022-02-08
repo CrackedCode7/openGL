@@ -16,12 +16,14 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/string_cast.hpp> // glm::to_string(mat) for matrix printing
 
 #include <iostream>
 #include <vector>
 
 #include "Shader.h"
 #include "Cube.h"
+#include "Camera.h"
 
 
 // Constant settings
@@ -41,31 +43,49 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 // Function to query from GLFW whether keys were pressed, etc.
 // -----------------------------------------------------------------------------
-void processInput(GLFWwindow* window)
+void processInput(GLFWwindow* window, Camera& camera)
 {
 	// Close window if ESC pressed
-	if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+	
+
+	// bool to decide whether we need to re-calculate matrices
+	bool recalulate = false;
 
 	// W key
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
-		std::cout << "pressed W" << std::endl;
+		camera.setCameraPos(camera.cameraPos - 0.1f * camera.cameraDirection);
+		camera.setCameraTarget(camera.cameraTarget - 0.1f * camera.cameraDirection);
+		recalulate = true;
 	}
 	// A key
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
-		std::cout << "pressed A" << std::endl;
+		camera.setCameraPos(camera.cameraPos + 0.1f * camera.cameraRight);
+		camera.setCameraTarget(camera.cameraTarget + 0.1f * camera.cameraRight);
+		recalulate = true;
 	}
 	// S key
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
-		std::cout << "pressed S" << std::endl;
+		camera.setCameraPos(camera.cameraPos + 0.1f * camera.cameraDirection);
+		camera.setCameraTarget(camera.cameraTarget + 0.1f * camera.cameraDirection);
+		recalulate = true;
 	}
 	// D key
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
-		std::cout << "pressed D" << std::endl;
+		camera.setCameraPos(camera.cameraPos - 0.1f * camera.cameraRight);
+		camera.setCameraTarget(camera.cameraTarget - 0.1f * camera.cameraRight);
+		recalulate = true;
+	}
+
+	// Re-calculate camera matrices if required
+	if (recalulate)
+	{
+		camera.recalculateMatrices();
 	}
 }
 
@@ -98,6 +118,7 @@ int main()
         return -1;
     }
 	glfwMakeContextCurrent(window); // Make new window current
+	//glfwSwapInterval(0); // No V-sync
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	
 
@@ -119,8 +140,8 @@ int main()
 	// -----------------------------------------------------------------------------
 	Cube cube = Cube(0, 0, 0);
 	std::vector<float> colors = {
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
 		1.0f, 0.0f, 0.0f,
 		1.0f, 0.0f, 0.0f,
 		1.0f, 0.0f, 0.0f,
@@ -156,7 +177,7 @@ int main()
 		1.0f, 0.0f, 0.0f,
 		1.0f, 0.0f, 0.0f
 	};
-
+	
 	// Generate Arrays and Buffers
 	unsigned int VBO1, VBO2, VAO, EBO;
 	glGenVertexArrays(1, &VAO);
@@ -193,42 +214,35 @@ int main()
 	// Set up initial camera position, look at, and up vectors
 	// Set up perspective projection, view, and model matrices
 	// -----------------------------------------------------------------------------
-	// Camera, look at, up vectors
-	glm::vec3 camera_pos = glm::vec3(0.0f, 0.0f, 5.0f);
-	glm::vec3 look_at = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-	// Projection matrix
-	glm::mat4 projection;
-	projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH/(float)SCR_HEIGHT, 0.1f, 100.0f);
-	// View matrix (using glm::lookAt)
-	glm::mat4 view;
-	view = glm::lookAt(camera_pos, look_at, up);
-	// Model matrix (identity in this case)
-	glm::mat4 model = glm::mat4(1.0f);
-	
+	Camera camera(0.0f, 0.0f, 5.0f, SCR_WIDTH, SCR_HEIGHT);
+
 
 	// OpenGL setup functions
 	// -----------------------------------------------------------------------------
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
 	
 
 	// Render loop
 	// -----------------------------------------------------------------------------
+	// Framerate variables
+	double previousTime = glfwGetTime();
+	int frameCount = 0;
+
+	// Main loop
 	while (!glfwWindowShouldClose(window))
     {
         // input
-		// ----------
-        processInput(window);
+		// -------------------------------------------------------------------------
+        processInput(window, camera);
 
 
 		// render
-		// ----------
+		// -------------------------------------------------------------------------
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		// Wireframe mode
+		// Fill mode
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		// New way to draw triangles using shader class
 		ourShader.use();
@@ -236,18 +250,28 @@ int main()
 		// the vertex attributes look like
 		glBindVertexArray(VAO);
 		// Setup uniforms in vertex shader
-		ourShader.setMat4("model", model);
-		ourShader.setMat4("view", view);
-		ourShader.setMat4("projection", projection);
+		ourShader.setMat4("model", camera.model);
+		ourShader.setMat4("view", camera.view);
+		ourShader.setMat4("projection", camera.projection);
 		// Draw (now with indexed vertices)
-		//glDrawArrays(GL_TRIANGLES, 0, 3);
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-		// ----------
+		// -------------------------------------------------------------------------
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+		// Framerate counting/displaying
+		double currentTime = glfwGetTime();
+		frameCount++;
+		if (currentTime - previousTime >= 1.0)
+		{
+			std::cout << frameCount << std::endl;
+
+			frameCount = 0;
+			previousTime = currentTime;
+		}
     }
 
 
@@ -256,11 +280,11 @@ int main()
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO1);
 	glDeleteBuffers(1, &VBO2);
+	glDeleteBuffers(1, &EBO);
 	
 
 	// Terminate glfw before the program ends
 	// -----------------------------------------------------------------------------
 	glfwTerminate();
-
 	return 0;
 }
