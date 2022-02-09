@@ -45,87 +45,6 @@ void processInput(GLFWwindow* window, Camera& camera)
 	// -----------------------------------------------------------------------------
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-	
-	
-	// Check movement keys (WASD, LCTRL, SPACE)
-	// -----------------------------------------------------------------------------
-	// bool to decide whether we need to re-calculate matrices
-	bool recalculate = false;
-
-	// W key
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-	{
-		camera.setCameraPos(camera.cameraPos - 0.1f * camera.cameraDirection);
-		camera.setCameraTarget(camera.cameraTarget - 0.1f * camera.cameraDirection);
-		recalculate = true;
-	}
-	// A key
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-	{
-		camera.setCameraPos(camera.cameraPos - 0.1f * camera.cameraRight);
-		camera.setCameraTarget(camera.cameraTarget - 0.1f * camera.cameraRight);
-		recalculate = true;
-	}
-	// S key
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-	{
-		camera.setCameraPos(camera.cameraPos + 0.1f * camera.cameraDirection);
-		camera.setCameraTarget(camera.cameraTarget + 0.1f * camera.cameraDirection);
-		recalculate = true;
-	}
-	// D key
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-	{
-		camera.setCameraPos(camera.cameraPos + 0.1f * camera.cameraRight);
-		camera.setCameraTarget(camera.cameraTarget + 0.1f * camera.cameraRight);
-		recalculate = true;
-	}
-	// Space bar
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-	{
-		camera.setCameraPos(camera.cameraPos + 0.1f * camera.up);
-		camera.setCameraTarget(camera.cameraTarget + 0.1f * camera.up);
-		recalculate = true;
-	}
-	// Left control
-	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-	{
-		camera.setCameraPos(camera.cameraPos - 0.1f * camera.up);
-		camera.setCameraTarget(camera.cameraTarget - 0.1f * camera.up);
-		recalculate = true;
-	}
-	
-	
-	// Check for rotation
-	// -----------------------------------------------------------------------------
-	
-	// Check mouse position
-	double xpos, ypos;
-	glfwGetCursorPos(window, &xpos, &ypos);
-	// Get window size (in case we resized)
-	int width, height;
-	glfwGetWindowSize(window, &width, &height);
-	
-	// Check whether cursor no longer in center (need to rotate)
-	if (floor(xpos) != floor(width/2.0))
-	{
-		std::cout << "x: " << xpos-width/2.0 << std::endl;
-	}
-	if (floor(ypos) != floor(height/2.0))
-	{
-		std::cout << "y: " << ypos-height/2.0 << std::endl;
-	}
-	
-	// Set cursor back to middle of window
-	glfwSetCursorPos(window, width/2.0, height/2.0);
-
-
-	// Re-calculate camera matrices if required
-	// -----------------------------------------------------------------------------
-	if (recalculate)
-	{
-		camera.recalculateMatrices();
-	}
 }
 
 
@@ -287,8 +206,7 @@ int main()
 		// Output frames and ticks once per second
 		if (currentTime - previousTime >= 1.0)
 		{
-			std::cout << frameCount << " fps" << std::endl;
-			std::cout << tickCount << " ticks\n" << std::endl;
+			std::cout << tickCount << " ticks " << frameCount << " fps" << std::endl;
 
 			frameCount = 0;
 			tickCount = 0;
@@ -303,7 +221,13 @@ int main()
 			// input
 			// ---------------------------------------------------------------------
 			processInput(window, camera);
+
+
+			// Camera input handling
+			// ---------------------------------------------------------------------
+			camera.handleInput(window);
 			
+
 			tickCount++;
 			previousTickTime = currentTime;
 		}
@@ -314,7 +238,7 @@ int main()
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Fill mode
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		// New way to draw triangles using shader class
 		ourShader.use();
 		// First have to bind vertex array object to tell the shader what 

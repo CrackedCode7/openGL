@@ -21,25 +21,6 @@ Cube::Cube(float x, float y, float z)
         };
 
     this -> indices = {
-        0, 2, 1,
-        0, 3, 2,
-        1, 6, 5,
-        1, 2, 6,
-        3, 6, 2,
-        3, 7, 6,
-        0, 7, 3,
-        0, 4, 7,
-        4, 6, 7,
-        4, 5, 6,
-        0, 5, 4,
-        0, 1, 5
-    };
-};
-    
-    
-    // Right-handed definition...opposite of "normal way"
-    /*
-    this -> indices = {
         0, 1, 2, // front
         0, 2, 3, // front
         1, 5, 6, // right
@@ -47,9 +28,10 @@ Cube::Cube(float x, float y, float z)
         3, 2, 6, // top
         3, 6, 7, // top
         0, 3, 7, // left
-        0, 7, 6, // left
+        0, 7, 4, // left
         4, 7, 6, // back
         4, 6, 5, // back
         0, 4, 5, // bottom
         0, 5, 1 // bottom
-    };*/
+    };
+};
