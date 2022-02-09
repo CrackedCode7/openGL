@@ -1,7 +1,7 @@
 /* -----------------------------------------------------------------------------
-	In this version I add a ticking system to the mix. I moved the process input
-	code to the ticking function so input (movement in this case) only processes
-	at 60 fps. I also added up/down movement.
+	In this version I add textures to the shaders and the cube class, which 
+	are loaded from textures.png, which should be expanded in the future and 
+	cube (blocks) updated
    ----------------------------------------------------------------------------- */
 
 
@@ -20,6 +20,8 @@
 #include "Shader.h"
 #include "Cube.h"
 #include "Camera.h"
+
+#include "stb_image.h"
 
 
 // Constant settings
@@ -96,22 +98,10 @@ int main()
 	Shader ourShader("shader.vs", "shader.fs");
 
 
-	// Set up vertex data, vertex buffers, vertex arrays
+	// Set up vertex data, vertex buffers, vertex arrays, textures
 	// -----------------------------------------------------------------------------
 	Cube cube = Cube(0, 0, 0);
 	std::vector<float> colors = {
-		0.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
 		1.0f, 0.0f, 0.0f,
 		1.0f, 0.0f, 0.0f,
 		1.0f, 0.0f, 0.0f,
@@ -138,11 +128,36 @@ int main()
 		1.0f, 0.0f, 0.0f
 	};
 	
+	// Load image with stb_image.h header
+	stbi_set_flip_vertically_on_load(true);
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load("textures.png", &width, &height, &nrChannels, 0);
+	// Generate texture
+	unsigned int texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	// Set texture wrapping and filter options
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		//glGenerateMipMap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+	}
+	stbi_image_free(data); // free image memory
+	
 	// Generate Arrays and Buffers
-	unsigned int VBO1, VBO2, VAO, EBO;
+	unsigned int VBO1, VBO2, VBO3, VAO, EBO;
 	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO1);
-	glGenBuffers(1, &VBO2);
+	glGenBuffers(1, &VBO1); //position
+	glGenBuffers(1, &VBO2); //color
+	glGenBuffers(1, &VBO3); //texCoords
 	glGenBuffers(1, &EBO);
 
 	// Bind the VAO first, then bind and set VBO(s), then configure vertex attribute(s)
@@ -161,6 +176,12 @@ int main()
 	glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), &colors[0], GL_STATIC_DRAW);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(1);
+	
+	// Texture coords attribute
+	glBindBuffer(GL_ARRAY_BUFFER, VBO3);
+	glBufferData(GL_ARRAY_BUFFER, cube.texCoords.size() * sizeof(float), &cube.texCoords[0], GL_STATIC_DRAW);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(2);
 	
 
 	// Unbind. Since VBO now unbound, we cannot set up vertex attributes.
@@ -248,6 +269,8 @@ int main()
 		ourShader.setMat4("model", camera.model);
 		ourShader.setMat4("view", camera.view);
 		ourShader.setMat4("projection", camera.projection);
+		// Bind Texture
+		glBindTexture(GL_TEXTURE_2D, texture);
 		// Draw (now with indexed vertices)
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 

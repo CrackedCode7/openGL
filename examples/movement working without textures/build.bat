@@ -1,0 +1,1 @@
+cmd.exe /k g++ main.cpp Shader.cpp Cube.cpp Camera.cpp VectorRotation.cpp glad.c -o main -I include -L lib -lglfw3dll -lopengl32
