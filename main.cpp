@@ -1,7 +1,8 @@
 /* -----------------------------------------------------------------------------
-	In this version I fixed textures to use an atlas and indexing. See the
-	cube class for correct indexing for a cube. The cube is now a grass block
-	with different texture from the atlas for the top, sides, and bottom.
+	In this version I added a shader for UI objects to render over 3D elements.
+	Use the UI shader for this, which is after the 3D shader. For now I have
+	not developed any UI objects that are useful, but these will be easy to add
+	once I create textures for text.
    ----------------------------------------------------------------------------- */
 
 
@@ -26,8 +27,8 @@
 
 // Constant settings
 // ---------------------------------------------------------------------------------
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 100;
+const unsigned int SCR_HEIGHT = 100;
 
 
 // Whenever the window size changes this callback is executed
@@ -93,9 +94,12 @@ int main()
     }
 
 
-	// New shader class implemented
+	// Shaders
 	// -----------------------------------------------------------------------------
+	// 3D element shader
 	Shader ourShader("shader.vs", "shader.fs");
+	// UI (2D) element shader
+	Shader uiShader("UI_shader.vs", "UI_shader.fs");
 
 
 	// Set up vertex data, vertex buffers, vertex arrays, textures
@@ -154,7 +158,7 @@ int main()
 	};
 	cube.setTextureCoords(textureWidth, textureHeight, 0, 0, 16, 16);
 
-	// Generate Arrays and Buffers
+	// Generate Arrays and Buffers for 3D shader
 	unsigned int VBO1, VBO2, VBO3, VAO, EBO;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO1); //position
@@ -192,6 +196,45 @@ int main()
 	// for calls like glDrawArrays to work.
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+	
+	// Define UI elements
+	std::vector<float> UI_verts = {
+		-1.0f, -1.0f, 0.0f, // bottom left
+		0.0f, -1.0f, 0.0f, // bottom right
+		0.0f, 0.0f, 0.0f, // top right
+		-1.0f, 0.0f, 0.0f // top left
+	};
+	std::vector<unsigned int> UI_indices = {
+		0, 1, 2,
+		0, 2, 3
+	};
+	std::vector<float> UI_texCoords = {
+		0.0f, 0.0f, // 0
+		1.0f, 0.0f, // 1
+		1.0f, 1.0f, // 2
+		0.0f, 1.0f // 3
+	};
+	
+	// Arrays and buffers for UI shader
+	unsigned int UI_VAO, UI_VBO1, UI_VBO2, UI_EBO;
+	glGenVertexArrays(1, &UI_VAO);
+	glGenBuffers(1, &UI_VBO1);
+	glGenBuffers(1, &UI_VBO2);
+	glGenBuffers(1, &UI_EBO);
+	// Bind UI VAO
+	glBindVertexArray(UI_VAO);
+	// Set up buffer data
+	glBindBuffer(GL_ARRAY_BUFFER, UI_VBO1);
+	glBufferData(GL_ARRAY_BUFFER, UI_verts.size() * sizeof(float), &UI_verts[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, UI_EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, UI_indices.size() * sizeof(unsigned int), &UI_indices[0], GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(unsigned int), (void*)0);
+	glEnableVertexAttribArray(0);
+	
+	glBindBuffer(GL_ARRAY_BUFFER, UI_VBO2);
+	glBufferData(GL_ARRAY_BUFFER, UI_texCoords.size() * sizeof(float), &UI_texCoords[0], GL_STATIC_DRAW);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
 	
 	
 	// Set up initial camera position, look at, and up vectors
@@ -273,8 +316,14 @@ int main()
 		ourShader.setMat4("projection", camera.projection);
 		// Bind Texture
 		glBindTexture(GL_TEXTURE_2D, texture);
-		// Draw (now with indexed vertices)
+		// Draw 3D
+		glEnable(GL_DEPTH_TEST);
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+		// Draw UI
+		uiShader.use();
+		glBindVertexArray(UI_VAO);
+		//glDisable(GL_DEPTH_TEST);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
