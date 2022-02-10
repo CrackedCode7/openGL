@@ -1,5 +1,8 @@
 Current item(s) to work on:
 
+  - Need to prevent the user from looking up or down past the flipping point. If we are within five degrees
+    or something we need to prevent it from going further.
+
   - Look into coloring different faces different colors. Specifically, how does the coloring work when we have
     an EBO with indics for the vertices, then a regular VBO for the colors? Maybe I should set up an EBO
     for the colors so that we can control the color of each vertex (I think this makes sense).

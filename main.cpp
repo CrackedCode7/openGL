@@ -1,7 +1,7 @@
 /* -----------------------------------------------------------------------------
-	In this version I add textures to the shaders and the cube class, which 
-	are loaded from textures.png, which should be expanded in the future and 
-	cube (blocks) updated
+	In this version I fixed textures to use an atlas and indexing. See the
+	cube class for correct indexing for a cube. The cube is now a grass block
+	with different texture from the atlas for the top, sides, and bottom.
    ----------------------------------------------------------------------------- */
 
 
@@ -26,8 +26,8 @@
 
 // Constant settings
 // ---------------------------------------------------------------------------------
-const unsigned int SCR_WIDTH = 300;
-const unsigned int SCR_HEIGHT = 300;
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 600;
 
 
 // Whenever the window size changes this callback is executed
@@ -100,6 +100,31 @@ int main()
 
 	// Set up vertex data, vertex buffers, vertex arrays, textures
 	// -----------------------------------------------------------------------------
+	// Load image with stb_image.h header
+	stbi_set_flip_vertically_on_load(true);
+	int textureWidth, textureHeight, nrChannels;
+	unsigned char* data = stbi_load("textures.png", &textureWidth, &textureHeight, &nrChannels, 0);
+	// Generate texture
+	unsigned int texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	// Set texture wrapping and filter options
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureWidth, textureHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		//glGenerateMipMap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+	}
+	stbi_image_free(data); // free image memory
+	
+	// Create cube, set up texture coordinates
 	Cube cube = Cube(0, 0, 0);
 	std::vector<float> colors = {
 		1.0f, 0.0f, 0.0f,
@@ -127,31 +152,8 @@ int main()
 		1.0f, 0.0f, 0.0f,
 		1.0f, 0.0f, 0.0f
 	};
-	
-	// Load image with stb_image.h header
-	stbi_set_flip_vertically_on_load(true);
-	int width, height, nrChannels;
-	unsigned char* data = stbi_load("textures.png", &width, &height, &nrChannels, 0);
-	// Generate texture
-	unsigned int texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	// Set texture wrapping and filter options
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		//glGenerateMipMap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "Failed to load texture" << std::endl;
-	}
-	stbi_image_free(data); // free image memory
-	
+	cube.setTextureCoords(textureWidth, textureHeight, 0, 0, 16, 16);
+
 	// Generate Arrays and Buffers
 	unsigned int VBO1, VBO2, VBO3, VAO, EBO;
 	glGenVertexArrays(1, &VAO);

@@ -1,6 +1,11 @@
 #include "Cube.h"
 
+#include "stb_image.h"
+
 #include <vector>
+#include <iostream>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 
 Cube::Cube(float x, float y, float z)
@@ -9,7 +14,7 @@ Cube::Cube(float x, float y, float z)
     this -> y = y;
     this -> z = z;
 
-    this -> vertices = {
+    vertices = {
         0.0f+x, 0.0f+y, 0.0f+z,
 		0.0f+x, 0.0f+y, 0.0f+z,
 		0.0f+x, 0.0f+y, 0.0f+z,
@@ -36,7 +41,7 @@ Cube::Cube(float x, float y, float z)
 		0.0f+x, 1.0f+y, -1.0f+z
         };
 
-    this -> indices = {
+    indices = {
         0, 3, 6, // front
         0, 6, 9, // front
         4, 15, 18, // right
@@ -50,46 +55,39 @@ Cube::Cube(float x, float y, float z)
         14, 17, 5, // bottom
         14, 5, 2 // bottom
     };
-	
-	this -> texCoords = {
-		(0.0f+0.5f)/16, (0.0f+0.5f)/16, // 0
-		(15.0f+0.5f)/16, (0.0f+0.5f)/16, // 1
-		(0.0f+0.5f)/16, (15.0f+0.5f)/16, // 2
-		(15.0f+0.5f)/16, (0.0f+0.5f)/16, // 3
-		(0.0f+0.5f)/16, (0.0f+0.5f)/16, // 4
-		(15.0f+0.5f)/16, (15.0f+0.5f)/16, // 5
-		(15.0f+0.5f)/16, (15.0f+0.5f)/16, // 6
-		(0.0f+0.5f)/16, (15.0f+0.5f)/16, // 7
-		(15.0f+0.5f)/16, (0.0f+0.5f)/16, // 8
-		(0.0f+0.5f)/16, (15.0f+0.5f)/16, // 9
-		(0.0f+0.5f)/16, (0.0f+0.5f)/16, // 10
-		(15.0f+0.5f)/16, (15.0f+0.5f)/16, // 11
-		(0.0f+0.5f)/16, (0.0f+0.5f)/16, // 12
-		(15.0f+0.5f)/16, (0.0f+0.5f)/16, // 13
-		(0.0f+0.5f)/16, (0.0f+0.5f)/16, // 14
-		(15.0f+0.5f)/16, (0.0f+0.5f)/16, // 15
-		(0.0f+0.5f)/16, (0.0f+0.5f)/16, // 16
-		(15.0f+0.5f)/16, (0.0f+0.5f)/16, // 17
-		(15.0f+0.5f)/16, (15.0f+0.5f)/16, // 18
-		(15.0f+0.5f)/16, (15.0f+0.5f)/16, // 19
-		(0.0f+0.5f)/16, (15.0f+0.5f)/16, // 20
-		(0.0f+0.5f)/16, (15.0f+0.5f)/16, // 21
-		(0.0f+0.5f)/16, (15.0f+0.5f)/16, // 22
-		(15.0f+0.5f)/16, (15.0f+0.5f)/16, // 23
-	};
 };
 
-/*this -> indices = {
-        0, 1, 2, // front
-        0, 2, 3, // front
-        1, 5, 6, // right
-        1, 6, 2, // right
-        3, 2, 6, // top
-        3, 6, 7, // top
-        4, 0, 3, // left
-        4, 3, 7, // left
-        5, 4, 7, // back
-        5, 7, 6, // back
-        4, 5, 1, // bottom
-        4, 1, 0 // bottom
-    };*/
+
+void Cube::setTextureCoords(int textureWidth, int textureHeight, int posX, int posY, int sizeX, int sizeY)
+{
+	this -> textureWidth = textureWidth;
+	this -> textureHeight = textureHeight;
+
+	// Sides utilize the first texture from atlas at posX, posY then top then bottom offset by sizes 
+	texCoords = {
+		(float)posX/textureWidth, (float)(textureHeight-posY-sizeY)/textureHeight, // 0
+		(float)(posX+sizeX)/textureWidth, (float)(textureHeight-posY-sizeY)/textureHeight, // 1
+		(float)(posX+2*sizeX)/textureWidth, (float)(textureHeight-posY)/textureHeight, // 2
+		(float)(posX+sizeX)/textureWidth, (float)(textureHeight-posY-sizeY)/textureHeight, // 3
+		(float)posX/textureWidth, (float)(textureHeight-posY-sizeY)/textureHeight, // 4
+		(float)(posX+3*sizeX)/textureWidth, (float)(textureHeight-posY)/textureHeight, // 5
+		(float)(posX+sizeX)/textureWidth, (float)(textureHeight-posY)/textureHeight, // 6
+		(float)posX/textureWidth, (float)(textureHeight-posY)/textureHeight, // 7
+		(float)(posX+2*sizeX)/textureWidth, (float)(textureHeight-posY-sizeY)/textureHeight, // 8
+		(float)posX/textureWidth, (float)(textureHeight-posY)/textureHeight, // 9
+		(float)(posX+sizeX)/textureWidth, (float)(textureHeight-posY-sizeY)/textureHeight, // 10
+		(float)(posX+sizeX)/textureWidth, (float)(textureHeight-posY)/textureHeight, // 11
+		(float)posX/textureWidth, (float)(textureHeight-posY-sizeY)/textureHeight, // 12
+		(float)(posX+sizeX)/textureWidth, (float)(textureHeight-posY-sizeY)/textureHeight, // 13
+		(float)(posX+2*sizeX)/textureWidth, (float)(textureHeight-posY-sizeY)/textureHeight, // 14
+		(float)(posX+sizeX)/textureWidth, (float)(textureHeight-posY-sizeY)/textureHeight, // 15
+		(float)posX/textureWidth, (float)(textureHeight-posY-sizeY)/textureHeight, // 16
+		(float)(posX+3*sizeX)/textureWidth, (float)(textureHeight-posY-sizeY)/textureHeight, // 17
+		(float)(posX+sizeX)/textureWidth, (float)(textureHeight-posY)/textureHeight, // 18
+		(float)(posX+2*sizeX)/textureWidth, (float)(textureHeight-posY)/textureHeight, // 19
+		(float)posX/textureWidth, (float)(textureHeight-posY)/textureHeight, // 20
+		(float)(posX+sizeX)/textureWidth, (float)(textureHeight-posY)/textureHeight, // 21
+		(float)posX/textureWidth, (float)(textureHeight-posY)/textureHeight, // 22
+		(float)(posX+sizeX)/textureWidth, (float)(textureHeight-posY)/textureHeight, // 23
+	};
+}
