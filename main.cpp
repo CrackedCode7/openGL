@@ -21,15 +21,15 @@
 #include "Shader.h"
 #include "Cube.h"
 #include "Camera.h"
-#include "fpsCounter.h"
+#include "text.h"
 
 #include "stb_image.h"
 
 
 // Constant settings
 // ---------------------------------------------------------------------------------
-const unsigned int SCR_WIDTH = 640;
-const unsigned int SCR_HEIGHT = 360;
+const unsigned int SCR_WIDTH = 100;
+const unsigned int SCR_HEIGHT = 100;
 
 
 // Whenever the window size changes this callback is executed
@@ -199,8 +199,7 @@ int main()
 	glBindVertexArray(0);
 	
 	// Define UI elements
-	fpsCounter fpsCounter(-1.0f, 1.0f, 0.05625f, 0.1f);
-	fpsCounter.setTextureCoords(textureWidth, textureHeight, 0, 504, 8, 8);
+	Text text(0.0f, 0.0f, 16.0f, 16.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, "FPS");
 	
 	// Arrays and buffers for UI shader
 	unsigned int UI_VAO, UI_VBO1, UI_VBO2, UI_EBO;
@@ -212,14 +211,14 @@ int main()
 	glBindVertexArray(UI_VAO);
 	// Set up buffer data
 	glBindBuffer(GL_ARRAY_BUFFER, UI_VBO1);
-	glBufferData(GL_ARRAY_BUFFER, fpsCounter.vertices.size() * sizeof(float), &fpsCounter.vertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, text.vertices.size() * sizeof(float), &text.vertices[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, UI_EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, fpsCounter.indices.size() * sizeof(unsigned int), &fpsCounter.indices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, text.indices.size() * sizeof(unsigned int), &text.indices[0], GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(unsigned int), (void*)0);
 	glEnableVertexAttribArray(0);
 	
 	glBindBuffer(GL_ARRAY_BUFFER, UI_VBO2);
-	glBufferData(GL_ARRAY_BUFFER, fpsCounter.texCoords.size() * sizeof(float), &fpsCounter.texCoords[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, text.texCoords.size() * sizeof(float), &text.texCoords[0], GL_STATIC_DRAW);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(1);
 	
@@ -310,7 +309,7 @@ int main()
 		uiShader.use();
 		glBindVertexArray(UI_VAO);
 		//glDisable(GL_DEPTH_TEST);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, 0);
 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
