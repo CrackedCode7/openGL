@@ -22,6 +22,7 @@
 #include "Cube.h"
 #include "Camera.h"
 #include "text.h"
+#include "twoDimensionalObject.h"
 
 #include "stb_image.h"
 
@@ -199,7 +200,8 @@ int main()
 	glBindVertexArray(0);
 	
 	// Define UI elements
-	Text text(0.0f, 0.0f, 16.0f, 16.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, "FPS");
+	//Text text(0.0f, 0.0f, 16.0f, 16.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, "FPS");
+	TwoDimensionalObject text(0.0f, 0.0f, 16.0f, 16.0f, 0.0f, 504.0f, 512.0f, 512.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT);
 	
 	// Arrays and buffers for UI shader
 	unsigned int UI_VAO, UI_VBO1, UI_VBO2, UI_EBO;
@@ -309,7 +311,7 @@ int main()
 		uiShader.use();
 		glBindVertexArray(UI_VAO);
 		//glDisable(GL_DEPTH_TEST);
-		glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
