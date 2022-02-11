@@ -21,14 +21,15 @@
 #include "Shader.h"
 #include "Cube.h"
 #include "Camera.h"
+#include "fpsCounter.h"
 
 #include "stb_image.h"
 
 
 // Constant settings
 // ---------------------------------------------------------------------------------
-const unsigned int SCR_WIDTH = 100;
-const unsigned int SCR_HEIGHT = 100;
+const unsigned int SCR_WIDTH = 640;
+const unsigned int SCR_HEIGHT = 360;
 
 
 // Whenever the window size changes this callback is executed
@@ -119,8 +120,8 @@ int main()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	if (data)
 	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureWidth, textureHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		//glGenerateMipMap(GL_TEXTURE_2D);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
 	{
@@ -198,22 +199,8 @@ int main()
 	glBindVertexArray(0);
 	
 	// Define UI elements
-	std::vector<float> UI_verts = {
-		-1.0f, -1.0f, 0.0f, // bottom left
-		0.0f, -1.0f, 0.0f, // bottom right
-		0.0f, 0.0f, 0.0f, // top right
-		-1.0f, 0.0f, 0.0f // top left
-	};
-	std::vector<unsigned int> UI_indices = {
-		0, 1, 2,
-		0, 2, 3
-	};
-	std::vector<float> UI_texCoords = {
-		0.0f, 0.0f, // 0
-		1.0f, 0.0f, // 1
-		1.0f, 1.0f, // 2
-		0.0f, 1.0f // 3
-	};
+	fpsCounter fpsCounter(-1.0f, 1.0f, 0.05625f, 0.1f);
+	fpsCounter.setTextureCoords(textureWidth, textureHeight, 0, 504, 8, 8);
 	
 	// Arrays and buffers for UI shader
 	unsigned int UI_VAO, UI_VBO1, UI_VBO2, UI_EBO;
@@ -225,14 +212,14 @@ int main()
 	glBindVertexArray(UI_VAO);
 	// Set up buffer data
 	glBindBuffer(GL_ARRAY_BUFFER, UI_VBO1);
-	glBufferData(GL_ARRAY_BUFFER, UI_verts.size() * sizeof(float), &UI_verts[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, fpsCounter.vertices.size() * sizeof(float), &fpsCounter.vertices[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, UI_EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, UI_indices.size() * sizeof(unsigned int), &UI_indices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, fpsCounter.indices.size() * sizeof(unsigned int), &fpsCounter.indices[0], GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(unsigned int), (void*)0);
 	glEnableVertexAttribArray(0);
 	
 	glBindBuffer(GL_ARRAY_BUFFER, UI_VBO2);
-	glBufferData(GL_ARRAY_BUFFER, UI_texCoords.size() * sizeof(float), &UI_texCoords[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, fpsCounter.texCoords.size() * sizeof(float), &fpsCounter.texCoords[0], GL_STATIC_DRAW);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(1);
 	
