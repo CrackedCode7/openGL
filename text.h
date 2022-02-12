@@ -1,21 +1,6 @@
 #pragma once
 
-#include <string>
-#include <vector>
-#include <map>
+#include "twoDimensionalObject.h"
 
-
-class Text
-{
-    public:
-        static std::map<char, std::vector<float>> textureMap;
-
-        std::string text;
-        size_t length;
-
-        std::vector<float> vertices;
-        std::vector<unsigned int> indices;
-        std::vector<float> texCoords;
-
-        Text(float xLoc, float yLoc, float xSize, float ySize, float xScreenSize, float yScreenSize, std::string text);
-};
+// Text should take the text string as input and the starting position of the text object in pixels.
+// Then it should use TwoDimensionalObjects for each text character, and place them appropriately and index the atlas.

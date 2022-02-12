@@ -5,7 +5,7 @@
 #include <iostream>
 
 
-TwoDimensionalObject::TwoDimensionalObject(float xLoc, float yLoc, float xSize, float ySize, float texPixelX, float texPixelY, float texSizeX, float texSizeY, float xScreenSize, float yScreenSize)
+TwoDimensionalObject::TwoDimensionalObject(float xLoc, float yLoc, float xSize, float ySize, float xScreenSize, float yScreenSize, float texPixelX, float texPixelY, float texSizeX, float texSizeY)
 {
     vertices.push_back(xPixelToScreenCoords(xLoc, xScreenSize)); // x0
     vertices.push_back(yPixelToScreenCoords(yLoc+ySize, yScreenSize)); // y0

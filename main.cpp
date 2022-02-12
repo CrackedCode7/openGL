@@ -29,8 +29,8 @@
 
 // Constant settings
 // ---------------------------------------------------------------------------------
-const unsigned int SCR_WIDTH = 100;
-const unsigned int SCR_HEIGHT = 100;
+const unsigned int SCR_WIDTH = 960;
+const unsigned int SCR_HEIGHT = 540;
 
 
 // Whenever the window size changes this callback is executed
@@ -201,7 +201,7 @@ int main()
 	
 	// Define UI elements
 	//Text text(0.0f, 0.0f, 16.0f, 16.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, "FPS");
-	TwoDimensionalObject text(0.0f, 0.0f, 16.0f, 16.0f, 0.0f, 504.0f, 512.0f, 512.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT);
+	TwoDimensionalObject text(0.0f, 0.0f, 16.0f, 16.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, 0.0f, 504.0f, 512.0f, 512.0f);
 	
 	// Arrays and buffers for UI shader
 	unsigned int UI_VAO, UI_VBO1, UI_VBO2, UI_EBO;
