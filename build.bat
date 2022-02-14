@@ -1,1 +1,1 @@
-cmd.exe /k g++ main.cpp Shader.cpp Cube.cpp Camera.cpp VectorRotation.cpp text.cpp twoDimensionalObject.cpp util.cpp stb_image.cpp glad.c -o main -I include -L lib -lglfw3dll -lopengl32
+cmd.exe /k g++ main.cpp Shader.cpp Cube.cpp Camera.cpp VectorRotation.cpp text.cpp twoDimensionalObject.cpp Texture.cpp util.cpp stb_image.cpp glad.c -o main -I include -L lib -lglfw3dll -lopengl32

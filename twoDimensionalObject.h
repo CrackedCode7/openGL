@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Texture.h"
 #include <vector>
 
 
@@ -20,5 +21,5 @@ class TwoDimensionalObject
         std::vector<unsigned int> indices;
         std::vector<float> texCoords;
 
-        TwoDimensionalObject(float xLoc, float yLoc, float xSize, float ySize, float xScreenSize, float yScreenSize, float texPixelX, float texPixelY, float texSizeX, float texSizeY);
+        TwoDimensionalObject(float xLoc, float yLoc, float xSize, float ySize, float xScreenSize, float yScreenSize, float texPixelX, float texPixelY, float texSizeX, float texSizeY, Texture texture);
 };

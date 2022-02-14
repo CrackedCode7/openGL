@@ -23,14 +23,15 @@
 #include "Camera.h"
 #include "text.h"
 #include "twoDimensionalObject.h"
+#include "Texture.h"
 
 #include "stb_image.h"
 
 
 // Constant settings
 // ---------------------------------------------------------------------------------
-const unsigned int SCR_WIDTH = 960;
-const unsigned int SCR_HEIGHT = 540;
+const unsigned int SCR_WIDTH = 320;
+const unsigned int SCR_HEIGHT = 180;
 
 
 // Whenever the window size changes this callback is executed
@@ -107,29 +108,8 @@ int main()
 	// Set up vertex data, vertex buffers, vertex arrays, textures
 	// -----------------------------------------------------------------------------
 	// Load image with stb_image.h header
-	stbi_set_flip_vertically_on_load(true);
-	int textureWidth, textureHeight, nrChannels;
-	unsigned char* data = stbi_load("textures.png", &textureWidth, &textureHeight, &nrChannels, 0);
-	// Generate texture
-	unsigned int texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	// Set texture wrapping and filter options
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "Failed to load texture" << std::endl;
-	}
-	stbi_image_free(data); // free image memory
-	
+	Texture texture("textures.png");
+		
 	// Create cube, set up texture coordinates
 	Cube cube = Cube(0, 0, 0);
 	std::vector<float> colors = {
@@ -158,7 +138,7 @@ int main()
 		1.0f, 0.0f, 0.0f,
 		1.0f, 0.0f, 0.0f
 	};
-	cube.setTextureCoords(textureWidth, textureHeight, 0, 0, 16, 16);
+	cube.setTextureCoords(texture.width, texture.height, 0, 0, 16, 16);
 
 	// Generate Arrays and Buffers for 3D shader
 	unsigned int VBO1, VBO2, VBO3, VAO, EBO;
@@ -200,8 +180,7 @@ int main()
 	glBindVertexArray(0);
 	
 	// Define UI elements
-	//Text text(0.0f, 0.0f, 16.0f, 16.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, "FPS");
-	TwoDimensionalObject text(0.0f, 0.0f, 16.0f, 16.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, 0.0f, 504.0f, 512.0f, 512.0f);
+	Text text("FPS", 0.0f, 0.0f, 16.0f, 16.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, texture);
 	
 	// Arrays and buffers for UI shader
 	unsigned int UI_VAO, UI_VBO1, UI_VBO2, UI_EBO;
@@ -213,6 +192,7 @@ int main()
 	glBindVertexArray(UI_VAO);
 	// Set up buffer data
 	glBindBuffer(GL_ARRAY_BUFFER, UI_VBO1);
+	// 
 	glBufferData(GL_ARRAY_BUFFER, text.vertices.size() * sizeof(float), &text.vertices[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, UI_EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, text.indices.size() * sizeof(unsigned int), &text.indices[0], GL_STATIC_DRAW);
@@ -303,15 +283,14 @@ int main()
 		ourShader.setMat4("view", camera.view);
 		ourShader.setMat4("projection", camera.projection);
 		// Bind Texture
-		glBindTexture(GL_TEXTURE_2D, texture);
+		glBindTexture(GL_TEXTURE_2D, texture.texture);
 		// Draw 3D
 		glEnable(GL_DEPTH_TEST);
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 		// Draw UI
 		uiShader.use();
 		glBindVertexArray(UI_VAO);
-		//glDisable(GL_DEPTH_TEST);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 6*text.objects.size(), GL_UNSIGNED_INT, 0);
 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)

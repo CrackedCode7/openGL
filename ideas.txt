@@ -1,5 +1,9 @@
 Current item(s) to work on:
   
+  - Texture class/object to use to store locations of texture portions. Use this to
+    hold the size and positions of the textures, and functions to access and return
+	pertinent info.
+  
   - 2D UI elements over 3D
   
   - Need to prevent the user from looking up or down past the flipping point. If we are within five degrees

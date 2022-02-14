@@ -1,11 +1,12 @@
 #include "twoDimensionalObject.h"
 #include "util.h"
+#include "Texture.h"
 
 #include <string>
 #include <iostream>
 
 
-TwoDimensionalObject::TwoDimensionalObject(float xLoc, float yLoc, float xSize, float ySize, float xScreenSize, float yScreenSize, float texPixelX, float texPixelY, float texSizeX, float texSizeY)
+TwoDimensionalObject::TwoDimensionalObject(float xLoc, float yLoc, float xSize, float ySize, float xScreenSize, float yScreenSize, float texPixelX, float texPixelY, float texSizeX, float texSizeY, Texture texture)
 {
     vertices.push_back(xPixelToScreenCoords(xLoc, xScreenSize)); // x0
     vertices.push_back(yPixelToScreenCoords(yLoc+ySize, yScreenSize)); // y0
@@ -33,12 +34,12 @@ TwoDimensionalObject::TwoDimensionalObject(float xLoc, float yLoc, float xSize, 
     indices.push_back(3);
 
 
-    texCoords.push_back(texPixelX/512); // 0
-    texCoords.push_back((512-texPixelY-8)/512); // 0
-    texCoords.push_back((texPixelX+8)/512); // 1
-    texCoords.push_back((512-texPixelY-8)/512); // 1
-    texCoords.push_back((texPixelX+8)/512); // 2
-    texCoords.push_back((512-texPixelY)/512); // 2
-    texCoords.push_back(texPixelX/512); // 3
-    texCoords.push_back((512-texPixelY)/512); // 3
+    texCoords.push_back(texPixelX/texture.width); // 0
+    texCoords.push_back((texture.height-texPixelY-texSizeY)/texture.height); // 0
+    texCoords.push_back((texPixelX+texSizeX)/texture.width); // 1
+    texCoords.push_back((texture.height-texPixelY-texSizeY)/texture.height); // 1
+    texCoords.push_back((texPixelX+texSizeX)/texture.width); // 2
+    texCoords.push_back((texture.height-texPixelY)/texture.height); // 2
+    texCoords.push_back(texPixelX/texture.width); // 3
+    texCoords.push_back((texture.height-texPixelY)/texture.height); // 3
 }
