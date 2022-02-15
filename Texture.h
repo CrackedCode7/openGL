@@ -15,5 +15,6 @@ class Texture
 		
 		static std::map<std::string, std::vector<int>> dict;
 		
+		Texture();
 		Texture(const char* filename);
 };

@@ -50,7 +50,11 @@ std::map<std::string, std::vector<int>> Texture::dict
 	{"7", std::vector<int> {264, 504, 8, 8}},
 	{"8", std::vector<int> {272, 504, 8, 8}},
 	{"9", std::vector<int> {280, 504, 8, 8}},
+	{":", std::vector<int> {288, 504, 8, 8}},
 };
+
+
+Texture::Texture(){}
 
 
 Texture::Texture(const char* filename)

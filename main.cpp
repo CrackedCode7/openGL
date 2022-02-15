@@ -17,6 +17,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath> // floor
+#include <string>
 
 #include "Shader.h"
 #include "Cube.h"
@@ -30,8 +31,8 @@
 
 // Constant settings
 // ---------------------------------------------------------------------------------
-const unsigned int SCR_WIDTH = 320;
-const unsigned int SCR_HEIGHT = 180;
+const unsigned int SCR_WIDTH = 960;
+const unsigned int SCR_HEIGHT = 540;
 
 
 // Whenever the window size changes this callback is executed
@@ -180,7 +181,8 @@ int main()
 	glBindVertexArray(0);
 	
 	// Define UI elements
-	Text text("FPS", 0.0f, 0.0f, 16.0f, 16.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, texture);
+	// FPS counter initializes to "XXXX", updated in tick/frame loop later.
+	Text text("FPS:XXXX", 0.0f, 0.0f, 12.0f, 12.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, texture);
 	
 	// Arrays and buffers for UI shader
 	unsigned int UI_VAO, UI_VBO1, UI_VBO2, UI_EBO;
@@ -192,15 +194,14 @@ int main()
 	glBindVertexArray(UI_VAO);
 	// Set up buffer data
 	glBindBuffer(GL_ARRAY_BUFFER, UI_VBO1);
-	// 
-	glBufferData(GL_ARRAY_BUFFER, text.vertices.size() * sizeof(float), &text.vertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, text.vertices.size() * sizeof(float), &text.vertices[0], GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, UI_EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, text.indices.size() * sizeof(unsigned int), &text.indices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, text.indices.size() * sizeof(unsigned int), &text.indices[0], GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(unsigned int), (void*)0);
 	glEnableVertexAttribArray(0);
 	
 	glBindBuffer(GL_ARRAY_BUFFER, UI_VBO2);
-	glBufferData(GL_ARRAY_BUFFER, text.texCoords.size() * sizeof(float), &text.texCoords[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, text.texCoords.size() * sizeof(float), &text.texCoords[0], GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(1);
 	
@@ -239,7 +240,18 @@ int main()
 		
 		// Output frames and ticks once per second
 		if (currentTime - previousTime >= 1.0)
-		{
+		{	
+			// Edit framerate text
+			std::string fpsText = "FPS:" + std::to_string(frameCount);
+			text.updateText(fpsText);
+			// Update buffers
+			glBindBuffer(GL_ARRAY_BUFFER, UI_VBO1);
+			glBufferSubData(GL_ARRAY_BUFFER, 0, text.vertices.size() * sizeof(float), &text.vertices[0]);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, UI_EBO);
+			glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, text.indices.size() * sizeof(unsigned int), &text.indices[0]);
+			glBindBuffer(GL_ARRAY_BUFFER, UI_VBO2);
+			glBufferSubData(GL_ARRAY_BUFFER, 0, text.texCoords.size() * sizeof(float), &text.texCoords[0]);
+			
 			std::cout << tickCount << " ticks " << frameCount << " fps" << std::endl;
 
 			frameCount = 0;

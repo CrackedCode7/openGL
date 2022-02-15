@@ -14,7 +14,28 @@
 
 Text::Text(std::string text, float xLoc, float yLoc, float xSize, float ySize, float xScreenSize, float yScreenSize, Texture texture)
 {
-	// Iterate over characters, make and store 2-D objects.
+    this -> text = text;
+    this -> xLoc = xLoc;
+    this -> yLoc = yLoc;
+    this -> xSize = xSize;
+    this -> ySize = ySize;
+    this -> xScreenSize = xScreenSize;
+    this -> yScreenSize = yScreenSize;
+    this -> texture = texture;
+
+	setup();
+}
+
+
+void Text::setup()
+{
+    // Clear data
+    objects.clear();
+    vertices.clear();
+    indices.clear();
+    texCoords.clear();
+
+    // Iterate over characters, make and store 2-D objects.
 	for (int i=0; i<text.length(); i++)
 	{
 		std::string letter;
@@ -39,4 +60,11 @@ Text::Text(std::string text, float xLoc, float yLoc, float xSize, float ySize, f
 			indices.push_back(objects[i].indices[j]+4*i);
 		}
 	}
+}
+
+
+void Text::updateText(std::string text)
+{
+    this -> text = text;
+    setup();
 }
