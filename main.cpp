@@ -31,8 +31,8 @@
 
 // Constant settings
 // ---------------------------------------------------------------------------------
-const unsigned int SCR_WIDTH = 960;
-const unsigned int SCR_HEIGHT = 540;
+const unsigned int SCR_WIDTH = 160;
+const unsigned int SCR_HEIGHT = 90;
 
 
 // Whenever the window size changes this callback is executed
@@ -113,32 +113,6 @@ int main()
 		
 	// Create cube, set up texture coordinates
 	Cube cube = Cube(0, 0, 0);
-	std::vector<float> colors = {
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f
-	};
 	cube.setTextureCoords(texture.width, texture.height, 0, 0, 16, 16);
 
 	// Generate Arrays and Buffers for 3D shader
@@ -162,7 +136,7 @@ int main()
 	
 	// color attribute
 	glBindBuffer(GL_ARRAY_BUFFER, VBO2);
-	glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), &colors[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, cube.colors.size() * sizeof(float), &cube.colors[0], GL_STATIC_DRAW);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(1);
 	
@@ -222,8 +196,10 @@ int main()
 	// Render loop
 	// -----------------------------------------------------------------------------
 	// Framerate variables
+	double startTime = glfwGetTime();
 	double previousTime = glfwGetTime();
 	double previousTickTime = glfwGetTime();
+	double previousFrameTime = glfwGetTime();
 	double tickTime = 1.0/60.0;
 	int frameCount = 0;
 	int tickCount = 0;
@@ -235,12 +211,11 @@ int main()
 		// -------------------------------------------------------------------------
 		double currentTime = glfwGetTime();
 		
-		// Increment number of frames
 		frameCount++;
 		
 		// Output frames and ticks once per second
 		if (currentTime - previousTime >= 1.0)
-		{	
+		{
 			// Edit framerate text
 			std::string fpsText = "FPS:" + std::to_string(frameCount);
 			text.updateText(fpsText);
@@ -253,16 +228,18 @@ int main()
 			glBufferSubData(GL_ARRAY_BUFFER, 0, text.texCoords.size() * sizeof(float), &text.texCoords[0]);
 			
 			std::cout << tickCount << " ticks " << frameCount << " fps" << std::endl;
-
+			
 			frameCount = 0;
 			tickCount = 0;
+
 			previousTime = currentTime;
 		}
 		
 		// Ticking system
 		// -------------------------------------------------------------------------
 		// Try to tick 60 times per second
-		if (currentTime - previousTickTime >= tickTime)
+		
+		if (floor((currentTime-startTime)/tickTime) != floor((previousTickTime-startTime)/tickTime))
 		{
 			// input
 			// ---------------------------------------------------------------------
