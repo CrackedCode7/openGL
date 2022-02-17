@@ -308,9 +308,7 @@ int main()
 				for (int i=0; i<5; i++)
 				{
 					float distance = sqrt(pow(playerChunkX-i, 2) + pow(playerChunkZ-0, 2));
-					std::cout << playerChunkX << " " << playerChunkZ << std::endl;
-					std::cout << distance << std::endl;
-					if (distance < 3.0f)
+					if (distance < 10.0f)
 					{
 						chunks.push_back(Chunk (i, 0));
 					}
