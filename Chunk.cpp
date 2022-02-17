@@ -3,10 +3,10 @@
 #include "Cube.h"
 
 
-Chunk::Chunk(int x, int y)
+Chunk::Chunk(int x, int z)
 {
     this -> x = x;
-    this -> y = y;
+    this -> z = z;
 
     // Generate blocks
     int index = 0;
@@ -16,7 +16,7 @@ Chunk::Chunk(int x, int y)
         {
             for (int k=0; k<16; k++)
             {
-                blockData.push_back(Cube(i+16*x, j+16*y, k));
+                blockData.push_back(Cube(i+16*x, j, k+16*z));
                 blockData[index].setTextureCoords(512, 512, 0, 0, 16, 16); // Change this when block class implemented
                 index++;
             }

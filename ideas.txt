@@ -1,5 +1,11 @@
 Current item(s) to work on:
   
+  - Make it so the buffer for the chunks is generated first, then use buffer sub data to set the vertices,
+    and update the number of elements to draw.
+    - Alternative could be to simply construct a mesh for each chunk in view, but this results in a lot 
+      more OpenGL calls. For example, a buffer will be created and have to be destroyed whenever a chunk 
+      is loaded/unloaded. This would work well with a better method of meshing (not just OpenGL culling)
+
   - Need to prevent the user from looking up or down past the flipping point. If we are within five degrees
     or something we need to prevent it from going further.
 

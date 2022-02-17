@@ -10,7 +10,7 @@ class Chunk
 {
     public:
         int x;
-        int y;
+        int z;
         std::vector<Cube> blockData;
         std::vector<float> vertices;
         std::vector<unsigned int> indices;

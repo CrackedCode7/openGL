@@ -112,8 +112,35 @@ int main()
 	// Load image with stb_image.h header
 	Texture texture("textures.png");
 
-	// Create a chunk
-	Chunk chunk(0, 0);
+	// Create chunks
+	std::vector<Chunk> chunks;
+	std::vector<float> vertices;
+	std::vector<unsigned int> indices;
+	std::vector<float> texCoords;
+	for (int i=0; i<5; i++)
+	{
+		chunks.push_back(Chunk (i, 0));
+	}
+	// Combine chunk verts, indices, and texCoords
+	int currentIndex = 0;
+	for (int i=0; i<chunks.size(); i++)
+	{
+		for (int j=0; j<chunks[i].vertices.size(); j++)
+		{
+			vertices.push_back(chunks[i].vertices[j]);
+		}
+		for (int j=0; j<chunks[i].texCoords.size(); j++)
+		{
+			texCoords.push_back(chunks[i].texCoords[j]);
+		}
+		for (int j=0; j<chunks[i].indices.size(); j++)
+		{
+			indices.push_back(chunks[i].indices[j]+currentIndex);
+		}
+		currentIndex += chunks[i].blockData.size()*24;
+	}
+
+	//Chunk chunk(0, 0);
 	// FOR COLORS RIGHT NOW, THEY CAN BE REMOVED LATER
 	Cube cube = Cube(0, 0, 0);
 	cube.setTextureCoords(texture.width, texture.height, 0, 0, 16, 16);
@@ -131,9 +158,9 @@ int main()
 
 	// Bind VBO and EBO and set up buffer data (vertices in this case)
 	glBindBuffer(GL_ARRAY_BUFFER, VBO1);
-	glBufferData(GL_ARRAY_BUFFER, chunk.vertices.size() * sizeof(float), &chunk.vertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, chunk.indices.size() * sizeof(unsigned int), &chunk.indices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(unsigned int), (void*)0);
 	glEnableVertexAttribArray(0);
 	
@@ -145,7 +172,7 @@ int main()
 	
 	// Texture coords attribute
 	glBindBuffer(GL_ARRAY_BUFFER, VBO3);
-	glBufferData(GL_ARRAY_BUFFER, chunk.texCoords.size() * sizeof(float), &chunk.texCoords[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, texCoords.size() * sizeof(float), &texCoords[0], GL_STATIC_DRAW);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(2);
 	
@@ -187,6 +214,10 @@ int main()
 	// Set up perspective projection, view, and model matrices
 	// -----------------------------------------------------------------------------
 	Camera camera(0.0f, 20.0f, -5.0f, SCR_WIDTH, SCR_HEIGHT);
+	int lastPlayerChunkX = floor(camera.cameraPos[0]);
+	int playerChunkX = floor(camera.cameraPos[0]);
+	int lastPlayerChunkZ = floor(camera.cameraPos[1]);
+	int playerChunkZ = floor(camera.cameraPos[1]);
 
 
 	// OpenGL setup functions
@@ -252,8 +283,62 @@ int main()
 			// Camera input handling
 			// ---------------------------------------------------------------------
 			camera.handleInput(window);
-			
 
+
+			// Chunk removal
+			// ---------------------------------------------------------------------
+			playerChunkX = floor(camera.cameraPos[0] / 16);
+			playerChunkZ = floor(camera.cameraPos[1] / 16);
+			if ((playerChunkX != lastPlayerChunkX) || (playerChunkZ != lastPlayerChunkZ))
+			{	
+				// Update last chunk to match current player chunk
+				lastPlayerChunkX = playerChunkX;
+				lastPlayerChunkZ = playerChunkZ;
+
+				// Clear mesh
+				vertices.clear();
+				indices.clear();
+				texCoords.clear();
+				chunks.clear();
+				for (int i=0; i<5; i++)
+				{
+					float distance = sqrt(pow(playerChunkX-i, 2) + pow(playerChunkZ-0, 2));
+					std::cout << distance << std::endl;
+					if (distance < 3)
+					{
+						chunks.push_back(Chunk (i, 0));
+					}
+				}
+				// Combine chunk verts, indices, and texCoords
+				int currentIndex = 0;
+				for (int i=0; i<chunks.size(); i++)
+				{
+					for (int j=0; j<chunks[i].vertices.size(); j++)
+					{
+						vertices.push_back(chunks[i].vertices[j]);
+					}
+					for (int j=0; j<chunks[i].texCoords.size(); j++)
+					{
+						texCoords.push_back(chunks[i].texCoords[j]);
+					}
+					for (int j=0; j<chunks[i].indices.size(); j++)
+					{
+						indices.push_back(chunks[i].indices[j]+currentIndex);
+					}
+					currentIndex += chunks[i].blockData.size()*24;
+				}
+
+				// Send data to buffers
+				glBindBuffer(GL_ARRAY_BUFFER, VBO1);
+				glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), &vertices[0]);
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+				glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, indices.size() * sizeof(unsigned int), &indices[0]);
+				glBindBuffer(GL_ARRAY_BUFFER, VBO3);
+				glBufferSubData(GL_ARRAY_BUFFER, 0, texCoords.size() * sizeof(float), &texCoords[0]);
+			}
+
+
+			// Tick
 			tickCount++;
 			previousTickTime = currentTime;
 		}
@@ -278,7 +363,7 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, texture.texture);
 		// Draw 3D
 		glEnable(GL_DEPTH_TEST);
-		glDrawElements(GL_TRIANGLES, 36*chunk.blockData.size(), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 36*vertices.size(), GL_UNSIGNED_INT, 0);
 		// Draw UI
 		uiShader.use();
 		glBindVertexArray(UI_VAO);
