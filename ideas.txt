@@ -1,5 +1,10 @@
 Current item(s) to work on:
   
+  - Running wireframe mode gives us many many interior triangles per chunk, becuase depth testing is not
+    culling, it is a per-pixel test to see which face is on top or closer to us. Experiment.
+
+  - Work on chunk meshing and loading/unloading chunks efficiently.
+
   - Make it so the buffer for the chunks is generated first, then use buffer sub data to set the vertices,
     and update the number of elements to draw.
     - Alternative could be to simply construct a mesh for each chunk in view, but this results in a lot 

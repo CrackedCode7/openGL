@@ -32,8 +32,8 @@
 
 // Constant settings
 // ---------------------------------------------------------------------------------
-const unsigned int SCR_WIDTH = 160;
-const unsigned int SCR_HEIGHT = 90;
+const unsigned int SCR_WIDTH = 1600;
+const unsigned int SCR_HEIGHT = 900;
 
 
 // Whenever the window size changes this callback is executed
@@ -117,7 +117,7 @@ int main()
 	std::vector<float> vertices;
 	std::vector<unsigned int> indices;
 	std::vector<float> texCoords;
-	for (int i=0; i<5; i++)
+	for (int i=0; i<1; i++)
 	{
 		chunks.push_back(Chunk (i, 0));
 	}
@@ -158,21 +158,21 @@ int main()
 
 	// Bind VBO and EBO and set up buffer data (vertices in this case)
 	glBindBuffer(GL_ARRAY_BUFFER, VBO1);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(unsigned int), (void*)0);
 	glEnableVertexAttribArray(0);
 	
 	// color attribute
 	glBindBuffer(GL_ARRAY_BUFFER, VBO2);
-	glBufferData(GL_ARRAY_BUFFER, cube.colors.size() * sizeof(float), &cube.colors[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, cube.colors.size() * sizeof(float), &cube.colors[0], GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(1);
 	
 	// Texture coords attribute
 	glBindBuffer(GL_ARRAY_BUFFER, VBO3);
-	glBufferData(GL_ARRAY_BUFFER, texCoords.size() * sizeof(float), &texCoords[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, texCoords.size() * sizeof(float), &texCoords[0], GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(2);
 	
@@ -288,7 +288,7 @@ int main()
 			// ---------------------------------------------------------------------
 			camera.handleInput(window);
 
-
+			/*
 			// Chunk removal
 			// ---------------------------------------------------------------------
 			playerChunkX = floor(camera.cameraPos[0] / 16);
@@ -343,7 +343,7 @@ int main()
 				glBindVertexArray(0);
 				glBindBuffer(GL_ARRAY_BUFFER, 0);
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-			}
+			}*/
 
 
 			// Tick
