@@ -32,8 +32,8 @@
 
 // Constant settings
 // ---------------------------------------------------------------------------------
-const unsigned int SCR_WIDTH = 1600;
-const unsigned int SCR_HEIGHT = 900;
+const unsigned int SCR_WIDTH = 160;
+const unsigned int SCR_HEIGHT = 90;
 
 
 // Whenever the window size changes this callback is executed
@@ -254,12 +254,16 @@ int main()
 			std::string fpsText = "FPS:" + std::to_string(frameCount);
 			text.updateText(fpsText);
 			// Update buffers
+			glBindVertexArray(UI_VAO);
 			glBindBuffer(GL_ARRAY_BUFFER, UI_VBO1);
 			glBufferSubData(GL_ARRAY_BUFFER, 0, text.vertices.size() * sizeof(float), &text.vertices[0]);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, UI_EBO);
 			glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, text.indices.size() * sizeof(unsigned int), &text.indices[0]);
 			glBindBuffer(GL_ARRAY_BUFFER, UI_VBO2);
 			glBufferSubData(GL_ARRAY_BUFFER, 0, text.texCoords.size() * sizeof(float), &text.texCoords[0]);
+			glBindVertexArray(0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			
 			std::cout << tickCount << " ticks " << frameCount << " fps" << std::endl;
 			
@@ -288,7 +292,8 @@ int main()
 			// Chunk removal
 			// ---------------------------------------------------------------------
 			playerChunkX = floor(camera.cameraPos[0] / 16);
-			playerChunkZ = floor(camera.cameraPos[1] / 16);
+			playerChunkZ = floor(camera.cameraPos[2] / 16);
+			
 			if ((playerChunkX != lastPlayerChunkX) || (playerChunkZ != lastPlayerChunkZ))
 			{	
 				// Update last chunk to match current player chunk
@@ -303,8 +308,9 @@ int main()
 				for (int i=0; i<5; i++)
 				{
 					float distance = sqrt(pow(playerChunkX-i, 2) + pow(playerChunkZ-0, 2));
+					std::cout << playerChunkX << " " << playerChunkZ << std::endl;
 					std::cout << distance << std::endl;
-					if (distance < 3)
+					if (distance < 3.0f)
 					{
 						chunks.push_back(Chunk (i, 0));
 					}
@@ -329,12 +335,16 @@ int main()
 				}
 
 				// Send data to buffers
+				glBindVertexArray(VAO);
 				glBindBuffer(GL_ARRAY_BUFFER, VBO1);
 				glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), &vertices[0]);
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 				glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, indices.size() * sizeof(unsigned int), &indices[0]);
 				glBindBuffer(GL_ARRAY_BUFFER, VBO3);
 				glBufferSubData(GL_ARRAY_BUFFER, 0, texCoords.size() * sizeof(float), &texCoords[0]);
+				glBindVertexArray(0);
+				glBindBuffer(GL_ARRAY_BUFFER, 0);
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			}
 
 
