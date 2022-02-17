@@ -17,7 +17,7 @@ Camera::Camera(float x, float y, float z, int SCR_WIDTH, int SCR_HEIGHT)
     this -> SCR_HEIGHT = SCR_HEIGHT;
 
     cameraPos = glm::vec3(x, y, z);
-    cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+    cameraTarget = glm::vec3(x, y, z+1.0f);
     
     up = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -63,46 +63,49 @@ void Camera::handleInput(GLFWwindow* window)
 	// bool to decide whether we need to re-calculate matrices
 	bool recalculate = false;
 
+	// Translation speed
+	float transSpeed = 1;
+
 	// W key
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
-		setCameraPos(cameraPos + 0.1f * cameraDirection);
-		setCameraTarget(cameraTarget + 0.1f * cameraDirection);
+		setCameraPos(cameraPos + transSpeed * cameraDirection);
+		setCameraTarget(cameraTarget + transSpeed * cameraDirection);
 		recalculate = true;
 	}
 	// A key
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
-		setCameraPos(cameraPos - 0.1f * cameraRight);
-		setCameraTarget(cameraTarget - 0.1f * cameraRight);
+		setCameraPos(cameraPos - transSpeed * cameraRight);
+		setCameraTarget(cameraTarget - transSpeed * cameraRight);
 		recalculate = true;
 	}
 	// S key
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
-		setCameraPos(cameraPos - 0.1f * cameraDirection);
-		setCameraTarget(cameraTarget - 0.1f * cameraDirection);
+		setCameraPos(cameraPos - transSpeed * cameraDirection);
+		setCameraTarget(cameraTarget - transSpeed * cameraDirection);
 		recalculate = true;
 	}
 	// D key
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
-		setCameraPos(cameraPos + 0.1f * cameraRight);
-		setCameraTarget(cameraTarget + 0.1f * cameraRight);
+		setCameraPos(cameraPos + transSpeed * cameraRight);
+		setCameraTarget(cameraTarget + transSpeed * cameraRight);
 		recalculate = true;
 	}
 	// Space bar
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
-		setCameraPos(cameraPos + 0.1f * up);
-		setCameraTarget(cameraTarget + 0.1f * up);
+		setCameraPos(cameraPos + transSpeed * up);
+		setCameraTarget(cameraTarget + transSpeed * up);
 		recalculate = true;
 	}
 	// Left control
 	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
 	{
-		setCameraPos(cameraPos - 0.1f * up);
-		setCameraTarget(cameraTarget - 0.1f * up);
+		setCameraPos(cameraPos - transSpeed * up);
+		setCameraTarget(cameraTarget - transSpeed * up);
 		recalculate = true;
 	}
 

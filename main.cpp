@@ -25,14 +25,15 @@
 #include "text.h"
 #include "twoDimensionalObject.h"
 #include "Texture.h"
+#include "Chunk.h"
 
 #include "stb_image.h"
 
 
 // Constant settings
 // ---------------------------------------------------------------------------------
-const unsigned int SCR_WIDTH = 160;
-const unsigned int SCR_HEIGHT = 90;
+const unsigned int SCR_WIDTH = 1600;
+const unsigned int SCR_HEIGHT = 900;
 
 
 // Whenever the window size changes this callback is executed
@@ -110,8 +111,10 @@ int main()
 	// -----------------------------------------------------------------------------
 	// Load image with stb_image.h header
 	Texture texture("textures.png");
-		
-	// Create cube, set up texture coordinates
+
+	// Create a chunk
+	Chunk chunk(0, 0);
+	// FOR COLORS RIGHT NOW, THEY CAN BE REMOVED LATER
 	Cube cube = Cube(0, 0, 0);
 	cube.setTextureCoords(texture.width, texture.height, 0, 0, 16, 16);
 
@@ -128,9 +131,9 @@ int main()
 
 	// Bind VBO and EBO and set up buffer data (vertices in this case)
 	glBindBuffer(GL_ARRAY_BUFFER, VBO1);
-	glBufferData(GL_ARRAY_BUFFER, cube.vertices.size() * sizeof(float), &cube.vertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, chunk.vertices.size() * sizeof(float), &chunk.vertices[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, cube.indices.size() * sizeof(unsigned int), &cube.indices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, chunk.indices.size() * sizeof(unsigned int), &chunk.indices[0], GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(unsigned int), (void*)0);
 	glEnableVertexAttribArray(0);
 	
@@ -142,7 +145,7 @@ int main()
 	
 	// Texture coords attribute
 	glBindBuffer(GL_ARRAY_BUFFER, VBO3);
-	glBufferData(GL_ARRAY_BUFFER, cube.texCoords.size() * sizeof(float), &cube.texCoords[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, chunk.texCoords.size() * sizeof(float), &chunk.texCoords[0], GL_STATIC_DRAW);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(2);
 	
@@ -183,7 +186,7 @@ int main()
 	// Set up initial camera position, look at, and up vectors
 	// Set up perspective projection, view, and model matrices
 	// -----------------------------------------------------------------------------
-	Camera camera(0.0f, 0.0f, 5.0f, SCR_WIDTH, SCR_HEIGHT);
+	Camera camera(0.0f, 20.0f, -5.0f, SCR_WIDTH, SCR_HEIGHT);
 
 
 	// OpenGL setup functions
@@ -275,7 +278,7 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, texture.texture);
 		// Draw 3D
 		glEnable(GL_DEPTH_TEST);
-		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 36*chunk.blockData.size(), GL_UNSIGNED_INT, 0);
 		// Draw UI
 		uiShader.use();
 		glBindVertexArray(UI_VAO);
