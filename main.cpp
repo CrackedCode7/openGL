@@ -32,8 +32,8 @@
 
 // Constant settings
 // ---------------------------------------------------------------------------------
-const unsigned int SCR_WIDTH = 1600;
-const unsigned int SCR_HEIGHT = 900;
+const unsigned int SCR_WIDTH = 160;
+const unsigned int SCR_HEIGHT = 90;
 
 
 // Whenever the window size changes this callback is executed
@@ -114,75 +114,10 @@ int main()
 
 	// Create chunks
 	std::vector<Chunk> chunks;
-	std::vector<float> vertices;
-	std::vector<unsigned int> indices;
-	std::vector<float> texCoords;
-	for (int i=0; i<1; i++)
+	for (int i=0; i<5; i++)
 	{
 		chunks.push_back(Chunk (i, 0));
 	}
-	// Combine chunk verts, indices, and texCoords
-	int currentIndex = 0;
-	for (int i=0; i<chunks.size(); i++)
-	{
-		for (int j=0; j<chunks[i].vertices.size(); j++)
-		{
-			vertices.push_back(chunks[i].vertices[j]);
-		}
-		for (int j=0; j<chunks[i].texCoords.size(); j++)
-		{
-			texCoords.push_back(chunks[i].texCoords[j]);
-		}
-		for (int j=0; j<chunks[i].indices.size(); j++)
-		{
-			indices.push_back(chunks[i].indices[j]+currentIndex);
-		}
-		currentIndex += chunks[i].blockData.size()*24;
-	}
-
-	//Chunk chunk(0, 0);
-	// FOR COLORS RIGHT NOW, THEY CAN BE REMOVED LATER
-	Cube cube = Cube(0, 0, 0);
-	cube.setTextureCoords(texture.width, texture.height, 0, 0, 16, 16);
-
-	// Generate Arrays and Buffers for 3D shader
-	unsigned int VBO1, VBO2, VBO3, VAO, EBO;
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO1); //position
-	glGenBuffers(1, &VBO2); //color
-	glGenBuffers(1, &VBO3); //texCoords
-	glGenBuffers(1, &EBO);
-
-	// Bind the VAO first, then bind and set VBO(s), then configure vertex attribute(s)
-	glBindVertexArray(VAO);
-
-	// Bind VBO and EBO and set up buffer data (vertices in this case)
-	glBindBuffer(GL_ARRAY_BUFFER, VBO1);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(unsigned int), (void*)0);
-	glEnableVertexAttribArray(0);
-	
-	// color attribute
-	glBindBuffer(GL_ARRAY_BUFFER, VBO2);
-	glBufferData(GL_ARRAY_BUFFER, cube.colors.size() * sizeof(float), &cube.colors[0], GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(1);
-	
-	// Texture coords attribute
-	glBindBuffer(GL_ARRAY_BUFFER, VBO3);
-	glBufferData(GL_ARRAY_BUFFER, texCoords.size() * sizeof(float), &texCoords[0], GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(2);
-	
-
-	// Unbind. Since VBO now unbound, we cannot set up vertex attributes.
-	// A VAO and VBO MUST be bound to use glVertexAttribPointer
-	// The VAO must be re-bound before drawing, and the shader activated
-	// for calls like glDrawArrays to work.
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
 	
 	// Define UI elements
 	// FPS counter initializes to "XXXX", updated in tick/frame loop later.
@@ -288,7 +223,7 @@ int main()
 			// ---------------------------------------------------------------------
 			camera.handleInput(window);
 
-			/*
+
 			// Chunk removal
 			// ---------------------------------------------------------------------
 			playerChunkX = floor(camera.cameraPos[0] / 16);
@@ -299,7 +234,8 @@ int main()
 				// Update last chunk to match current player chunk
 				lastPlayerChunkX = playerChunkX;
 				lastPlayerChunkZ = playerChunkZ;
-
+				/*
+				double meshTimeStart = glfwGetTime();
 				// Clear mesh
 				vertices.clear();
 				indices.clear();
@@ -331,7 +267,8 @@ int main()
 					}
 					currentIndex += chunks[i].blockData.size()*24;
 				}
-
+				double meshTimeEnd = glfwGetTime();
+				double dataManipStart = meshTimeEnd;
 				// Send data to buffers
 				glBindVertexArray(VAO);
 				glBindBuffer(GL_ARRAY_BUFFER, VBO1);
@@ -343,7 +280,11 @@ int main()
 				glBindVertexArray(0);
 				glBindBuffer(GL_ARRAY_BUFFER, 0);
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-			}*/
+				double dataManipEnd = glfwGetTime();
+				
+				std::cout << "Mesh time: " << meshTimeEnd-meshTimeStart << std::endl;
+				std::cout << "Data manipulation time: " << dataManipEnd-dataManipStart << std::endl;*/
+			}
 
 
 			// Tick
@@ -358,11 +299,9 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Fill mode
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		// New way to draw triangles using shader class
+		
+		// Activate 3D shader
 		ourShader.use();
-		// First have to bind vertex array object to tell the shader what 
-		// the vertex attributes look like
-		glBindVertexArray(VAO);
 		// Setup uniforms in vertex shader
 		ourShader.setMat4("model", camera.model);
 		ourShader.setMat4("view", camera.view);
@@ -370,8 +309,11 @@ int main()
 		// Bind Texture
 		glBindTexture(GL_TEXTURE_2D, texture.texture);
 		// Draw 3D
-		glEnable(GL_DEPTH_TEST);
-		glDrawElements(GL_TRIANGLES, 36*vertices.size(), GL_UNSIGNED_INT, 0);
+		for (int i = 0; i<chunks.size(); i++)
+		{
+			chunks[i].draw();
+		}
+		
 		// Draw UI
 		uiShader.use();
 		glBindVertexArray(UI_VAO);
@@ -387,10 +329,14 @@ int main()
 
 	// Optionally de-allocate resources
 	// -----------------------------------------------------------------------------
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO1);
-	glDeleteBuffers(1, &VBO2);
-	glDeleteBuffers(1, &EBO);
+	//glDeleteVertexArrays(1, &VAO);
+	//glDeleteBuffers(1, &VBO1);
+	//glDeleteBuffers(1, &VBO2);
+	//glDeleteBuffers(1, &EBO);
+	glDeleteVertexArrays(1, &UI_VAO);
+	glDeleteBuffers(1, &UI_VBO1);
+	glDeleteBuffers(1, &UI_VBO2);
+	glDeleteBuffers(1, &UI_EBO);
 	
 
 	// Terminate glfw before the program ends
