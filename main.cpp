@@ -32,8 +32,8 @@
 
 // Constant settings
 // ---------------------------------------------------------------------------------
-const unsigned int SCR_WIDTH = 160;
-const unsigned int SCR_HEIGHT = 90;
+const unsigned int SCR_WIDTH = 1600;
+const unsigned int SCR_HEIGHT = 900;
 
 
 // Whenever the window size changes this callback is executed
@@ -53,6 +53,23 @@ void processInput(GLFWwindow* window, Camera& camera)
 	// -----------------------------------------------------------------------------
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+	
+
+	// Toggle wireframe mode
+	if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS)
+	{
+		int polygonMode;
+		glGetIntegerv(GL_POLYGON_MODE, &polygonMode);
+
+		if (polygonMode == GL_LINE)
+		{
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		}
+		else if (polygonMode == GL_FILL)
+		{
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		}
+	}
 }
 
 
@@ -298,7 +315,7 @@ int main()
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Fill mode
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		
 		// Activate 3D shader
 		ourShader.use();
