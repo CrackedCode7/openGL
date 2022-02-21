@@ -1,11 +1,3 @@
-/* -----------------------------------------------------------------------------
-	In this version I added a shader for UI objects to render over 3D elements.
-	Use the UI shader for this, which is after the 3D shader. For now I have
-	not developed any UI objects that are useful, but these will be easy to add
-	once I create textures for text.
-   ----------------------------------------------------------------------------- */
-
-
 #include <glad/glad.h> // before glfw (I think it HAS to be)
 #include <GLFW/glfw3.h>
 
@@ -32,8 +24,8 @@
 
 // Constant settings
 // ---------------------------------------------------------------------------------
-const unsigned int SCR_WIDTH = 1600;
-const unsigned int SCR_HEIGHT = 900;
+const unsigned int SCR_WIDTH = 160;
+const unsigned int SCR_HEIGHT = 90;
 
 
 // Whenever the window size changes this callback is executed
@@ -138,7 +130,7 @@ int main()
 	
 	// Define UI elements
 	// FPS counter initializes to "XXXX", updated in tick/frame loop later.
-	Text text("FPS:XXXX", 0.0f, 0.0f, 12.0f, 12.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, texture);
+	Text text("FPS:XXXX", 0.0f, 0.0f, 12.0f, 12.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, &texture);
 	
 	// Arrays and buffers for UI shader
 	unsigned int UI_VAO, UI_VBO1, UI_VBO2, UI_EBO;

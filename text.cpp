@@ -12,7 +12,7 @@
 // We are using the constant map of the texture to determine the texture 
 // pixel locations for the 2D object constructor
 
-Text::Text(std::string text, float xLoc, float yLoc, float xSize, float ySize, float xScreenSize, float yScreenSize, Texture texture)
+Text::Text(std::string text, float xLoc, float yLoc, float xSize, float ySize, float xScreenSize, float yScreenSize, Texture* texture)
 {
     this -> text = text;
     this -> xLoc = xLoc;
@@ -41,7 +41,7 @@ void Text::setup()
 		std::string letter;
 		letter.push_back(text[i]);
 		
-		objects.push_back(TwoDimensionalObject(xLoc+i*xSize, yLoc, xSize, ySize, xScreenSize, yScreenSize, texture.dict[letter][0], texture.dict[letter][1], texture.dict[letter][2], texture.dict[letter][3], texture));
+		objects.push_back(TwoDimensionalObject(xLoc+i*xSize, yLoc, xSize, ySize, xScreenSize, yScreenSize, texture->dict[letter][0], texture->dict[letter][1], texture->dict[letter][2], texture->dict[letter][3], texture));
 	}
 	
 	// Construct vertices, indices, and texCoords from objects

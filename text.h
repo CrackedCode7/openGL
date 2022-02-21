@@ -28,7 +28,7 @@ class Text
 		float ySize;
 		float xScreenSize;
 		float yScreenSize;
-		Texture texture;
+		Texture* texture;
 		
 		std::vector<TwoDimensionalObject> objects;
 		
@@ -36,7 +36,7 @@ class Text
         std::vector<unsigned int> indices;
         std::vector<float> texCoords;
 
-		Text(std::string text, float xLoc, float yLoc, float xSize, float ySize, float xScreenSize, float yScreenSize, Texture texture);
+		Text(std::string text, float xLoc, float yLoc, float xSize, float ySize, float xScreenSize, float yScreenSize, Texture* texture);
 
 		void setup();
 		void updateText(std::string text);
