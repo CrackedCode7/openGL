@@ -18,7 +18,6 @@ class Chunk
 		// OpenGL attributes/buffers
 		unsigned int VAO;
 		unsigned int vertexVBO;
-		unsigned int indexVBO;
 		unsigned int textureVBO;
 		unsigned int EBO;
 		

@@ -10,7 +10,6 @@ void Chunk::load()
 	// Set up OpenGL buffers
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &vertexVBO);
-	glGenBuffers(1, &indexVBO);
 	glGenBuffers(1, &textureVBO);
 	glGenBuffers(1, &EBO);
 	
@@ -54,7 +53,6 @@ void Chunk::unload()
 	// Their values are set to 0, which means it is not a buffer object.
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &vertexVBO);
-	glDeleteBuffers(1, &indexVBO);
 	glDeleteBuffers(1, &textureVBO);
 	glDeleteBuffers(1, &EBO);
 	
@@ -97,16 +95,17 @@ Chunk::Chunk(int x, int z)
     // Construct mesh on generation
     for (int i=0; i<blockData.size(); i++)
 	{
-		for (int j=0; j<72; j++)
+		for (int j=0; j<blockData[i].vertices.size(); j++)
 		{
 			vertices.push_back(blockData[i].vertices[j]);
 		}
-		for (int j=0; j<48; j++)
+		for (int j=0; j<blockData[i].texCoords.size(); j++)
 		{
 			texCoords.push_back(blockData[i].texCoords[j]);
 		}
-		for (int j=0; j<36; j++)
+		for (int j=0; j<blockData[i].indices.size(); j++)
 		{
+			// 24 unique indices per block
 			indices.push_back(blockData[i].indices[j]+24*i);
 		}
 	}

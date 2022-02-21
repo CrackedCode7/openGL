@@ -35,7 +35,8 @@ class Text
 		std::vector<float> vertices;
         std::vector<unsigned int> indices;
         std::vector<float> texCoords;
-
+		
+		Text();
 		Text(std::string text, float xLoc, float yLoc, float xSize, float ySize, float xScreenSize, float yScreenSize, Texture* texture);
 
 		void setup();

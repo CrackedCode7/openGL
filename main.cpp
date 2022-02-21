@@ -18,6 +18,7 @@
 #include "twoDimensionalObject.h"
 #include "Texture.h"
 #include "Chunk.h"
+#include "debugScreen.h"
 
 #include "stb_image.h"
 
@@ -130,28 +131,10 @@ int main()
 	
 	// Define UI elements
 	// FPS counter initializes to "XXXX", updated in tick/frame loop later.
-	Text text("FPS:XXXX", 0.0f, 0.0f, 12.0f, 12.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, &texture);
-	
-	// Arrays and buffers for UI shader
-	unsigned int UI_VAO, UI_VBO1, UI_VBO2, UI_EBO;
-	glGenVertexArrays(1, &UI_VAO);
-	glGenBuffers(1, &UI_VBO1);
-	glGenBuffers(1, &UI_VBO2);
-	glGenBuffers(1, &UI_EBO);
-	// Bind UI VAO
-	glBindVertexArray(UI_VAO);
-	// Set up buffer data
-	glBindBuffer(GL_ARRAY_BUFFER, UI_VBO1);
-	glBufferData(GL_ARRAY_BUFFER, text.vertices.size() * sizeof(float), &text.vertices[0], GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, UI_EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, text.indices.size() * sizeof(unsigned int), &text.indices[0], GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(unsigned int), (void*)0);
-	glEnableVertexAttribArray(0);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, UI_VBO2);
-	glBufferData(GL_ARRAY_BUFFER, text.texCoords.size() * sizeof(float), &text.texCoords[0], GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(1);
+	Text fpsText("FPS:XXXX", 0.0f, 0.0f, 12.0f, 12.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, &texture);
+	Text tpsText("TPS:XX", 0.0f, 12.0f, 12.0f, 12.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, &texture);
+	DebugScreen debugScreen;
+	debugScreen.updateText(&fpsText, &tpsText);
 	
 	
 	// Set up initial camera position, look at, and up vectors
@@ -195,19 +178,12 @@ int main()
 		if (currentTime - previousTime >= 1.0)
 		{
 			// Edit framerate text
-			std::string fpsText = "FPS:" + std::to_string(frameCount);
-			text.updateText(fpsText);
-			// Update buffers
-			glBindVertexArray(UI_VAO);
-			glBindBuffer(GL_ARRAY_BUFFER, UI_VBO1);
-			glBufferSubData(GL_ARRAY_BUFFER, 0, text.vertices.size() * sizeof(float), &text.vertices[0]);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, UI_EBO);
-			glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, text.indices.size() * sizeof(unsigned int), &text.indices[0]);
-			glBindBuffer(GL_ARRAY_BUFFER, UI_VBO2);
-			glBufferSubData(GL_ARRAY_BUFFER, 0, text.texCoords.size() * sizeof(float), &text.texCoords[0]);
-			glBindVertexArray(0);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			std::string fpsStr = "FPS:" + std::to_string(frameCount);
+			fpsText.updateText(fpsStr);
+			std::string tpsStr = "TPS:" + std::to_string(tickCount);
+			tpsText.updateText(tpsStr);
+			
+			debugScreen.updateText(&fpsText, &tpsText);
 			
 			std::cout << tickCount << " ticks " << frameCount << " fps" << std::endl;
 			
@@ -306,8 +282,6 @@ int main()
 		// -------------------------------------------------------------------------
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		// Fill mode
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		
 		// Activate 3D shader
 		ourShader.use();
@@ -325,8 +299,7 @@ int main()
 		
 		// Draw UI
 		uiShader.use();
-		glBindVertexArray(UI_VAO);
-		glDrawElements(GL_TRIANGLES, 6*text.objects.size(), GL_UNSIGNED_INT, 0);
+		debugScreen.draw();
 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -342,10 +315,10 @@ int main()
 	//glDeleteBuffers(1, &VBO1);
 	//glDeleteBuffers(1, &VBO2);
 	//glDeleteBuffers(1, &EBO);
-	glDeleteVertexArrays(1, &UI_VAO);
-	glDeleteBuffers(1, &UI_VBO1);
-	glDeleteBuffers(1, &UI_VBO2);
-	glDeleteBuffers(1, &UI_EBO);
+	//glDeleteVertexArrays(1, &UI_VAO);
+	//glDeleteBuffers(1, &UI_VBO1);
+	//glDeleteBuffers(1, &UI_VBO2);
+	//glDeleteBuffers(1, &UI_EBO);
 	
 
 	// Terminate glfw before the program ends

@@ -5,6 +5,10 @@
 #include <string>
 
 
+// Default (empty) constructor
+Text::Text(){};
+
+
 // Constructor takes the input string and location/size info
 // A 2D object is made for each character in the string, with the
 // correct location in screen space given as input to the 2D objects
