@@ -1,6 +1,6 @@
 #include "debugScreen.h"
 
-#include "text.h"
+#include "src/renderable/2D/text.h"
 #include <glad/glad.h>
 #include <iostream>
 

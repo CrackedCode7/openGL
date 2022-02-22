@@ -1,6 +1,4 @@
-#include "Cube.h"
-
-#include "stb_image.h"
+#include "Block.h"
 
 #include <vector>
 #include <iostream>
@@ -8,7 +6,7 @@
 #include <GLFW/glfw3.h>
 
 
-Cube::Cube(float x, float y, float z)
+Block::Block(float x, float y, float z)
 {
     this -> x = x;
     this -> y = y;
@@ -85,7 +83,7 @@ Cube::Cube(float x, float y, float z)
 };
 
 
-void Cube::setTextureCoords(int textureWidth, int textureHeight, int posX, int posY, int sizeX, int sizeY)
+void Block::setTextureCoords(int textureWidth, int textureHeight, int posX, int posY, int sizeX, int sizeY)
 {
 	this -> textureWidth = textureWidth;
 	this -> textureHeight = textureHeight;

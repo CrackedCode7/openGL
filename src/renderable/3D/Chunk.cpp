@@ -1,7 +1,7 @@
 #include "Chunk.h"
 
 #include <glad/glad.h>
-#include "Cube.h"
+#include "Block.h"
 
 
 void Chunk::load()
@@ -85,7 +85,7 @@ Chunk::Chunk(int x, int z)
         {
             for (int k=0; k<16; k++)
             {
-                blockData.push_back(Cube(i+16*x, j, k+16*z));
+                blockData.push_back(Block(i+16*x, j, k+16*z));
                 blockData[index].setTextureCoords(512, 512, 0, 0, 16, 16); // Change this when block class implemented
                 index++;
             }

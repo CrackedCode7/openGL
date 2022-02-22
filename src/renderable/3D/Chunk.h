@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Cube.h"
+#include "Block.h"
 
 #include <map>
 #include <vector>
@@ -13,7 +13,7 @@ class Chunk
         int x;
         int z;
 		bool loaded = false;
-        std::vector<Cube> blockData;
+        std::vector<Block> blockData;
 		
 		// OpenGL attributes/buffers
 		unsigned int VAO;

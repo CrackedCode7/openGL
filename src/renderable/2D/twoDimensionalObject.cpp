@@ -1,6 +1,6 @@
 #include "twoDimensionalObject.h"
-#include "util.h"
-#include "Texture.h"
+#include "src/util/util.h"
+#include "src/textures/Texture.h"
 
 #include <string>
 #include <iostream>

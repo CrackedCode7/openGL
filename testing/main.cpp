@@ -6,7 +6,6 @@
 
 int main()
 {
-	std::map<std::string
 
 	std::ifstream file;
 	file.open("config.cfg", std::ios::in);
