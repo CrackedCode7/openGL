@@ -22,11 +22,13 @@
 
 #include "stb_image.h"
 
+#include "src/setup/GLFW/windowSetup.h"
+
 
 // Constant settings
 // ---------------------------------------------------------------------------------
-const unsigned int SCR_WIDTH = 160;
-const unsigned int SCR_HEIGHT = 90;
+const unsigned int SCR_WIDTH = 1600;
+const unsigned int SCR_HEIGHT = 900;
 
 
 // Whenever the window size changes this callback is executed
@@ -68,36 +70,15 @@ void processInput(GLFWwindow* window, Camera& camera)
 
 int main()
 {
-	// Initialize GLFW
-	// -----------------------------------------------------------------------------
-	if (!glfwInit())
+	// Initialize GLFW and versions
+	if (!window::initializeGLFW())
 	{
 		std::cout << "Failed to initialize GLFW" << std::endl;
 		return -1;
 	}
 	
-
-	// Set up correct versions
-	// -----------------------------------------------------------------------------
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	
-
-	// Create glfw Window
-	// -----------------------------------------------------------------------------
-	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "OpenGL", NULL, NULL);
-	if (window == NULL)
-    {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-	glfwMakeContextCurrent(window); // Make new window current
-	glfwSwapInterval(0); // No V-sync
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-	glfwSetCursorPos(window, SCR_WIDTH/2.0, SCR_HEIGHT/2.0); // cursor in middle
+	// Create GLFW window for rendering
+	GLFWwindow* window = window::createWindow();
 	
 
 	// Initialize GLAD
@@ -114,7 +95,7 @@ int main()
 	// 3D element shader
 	Shader ourShader("shader.vs", "shader.fs");
 	// UI (2D) element shader
-	Shader uiShader("UI_shader.vs", "UI_shader.fs");
+	Shader uiShader("src/UI/shader/UI_shader.vs", "src/UI/shader/UI_shader.fs");
 
 
 	// Set up vertex data, vertex buffers, vertex arrays, textures
@@ -131,8 +112,8 @@ int main()
 	
 	// Define UI elements
 	// FPS counter initializes to "XXXX", updated in tick/frame loop later.
-	Text fpsText("FPS:XXXX", 0.0f, 0.0f, 12.0f, 12.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, &texture);
-	Text tpsText("TPS:XX", 0.0f, 12.0f, 12.0f, 12.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, &texture);
+	Text fpsText("FPS:XXXX", 0.0f, 0.0f, 20.0f, 20.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, &texture);
+	Text tpsText("TPS:XX", 0.0f, 20.0f, 20.0f, 20.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, &texture);
 	DebugScreen debugScreen;
 	debugScreen.updateText(&fpsText, &tpsText);
 	
