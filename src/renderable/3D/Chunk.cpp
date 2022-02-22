@@ -76,7 +76,26 @@ void Chunk::draw()
 
 void Chunk::mesh()
 {
-	
+	std::map<std::vector<int>, Block>::iterator it;
+	int i=0;
+    for (it=blockData.begin(); it!=blockData.end(); it++)
+	{
+		// key is first, block is second
+		for (int j=0; j<it->second.vertices.size(); j++)
+		{
+			vertices.push_back(it->second.vertices[j]);
+		}
+		for (int j=0; j<it->second.texCoords.size(); j++)
+		{
+			texCoords.push_back(it->second.texCoords[j]);
+		}
+		for (int j=0; j<it->second.indices.size(); j++)
+		{
+			// 24 unique indices per block
+			indices.push_back(it->second.indices[j]+24*i);
+		}
+		i++; // number of blocks
+	}
 }
 
 
@@ -102,26 +121,7 @@ Chunk::Chunk(int x, int z)
     }
 
     // Construct mesh on generation
-	std::map<std::vector<int>, Block>::iterator it;
-	int i=0;
-    for (it=blockData.begin(); it!=blockData.end(); it++)
-	{
-		// key is first, block is second
-		for (int j=0; j<it->second.vertices.size(); j++)
-		{
-			vertices.push_back(it->second.vertices[j]);
-		}
-		for (int j=0; j<it->second.texCoords.size(); j++)
-		{
-			texCoords.push_back(it->second.texCoords[j]);
-		}
-		for (int j=0; j<it->second.indices.size(); j++)
-		{
-			// 24 unique indices per block
-			indices.push_back(it->second.indices[j]+24*i);
-		}
-		i++; // number of blocks
-	}
+	mesh();
 	
 	// Load data into buffers for rendering
 	// Assumes that when a chunk is generated it should be ready to render

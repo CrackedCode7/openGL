@@ -83,7 +83,7 @@ Block::Block(float x, float y, float z)
 		1.0f, 0.0f, 0.0f,
 		1.0f, 0.0f, 0.0f
 	};
-};
+}
 
 
 void Block::setTextureCoords(int textureWidth, int textureHeight, int posX, int posY, int sizeX, int sizeY)

@@ -1,1 +1,4 @@
 Chunks should use a map for easier block indexing. x, y, z starting block values
+
+Need to figure out how I am going to add verts/indices for faces
+	Maybe store things per face, keep track of offset per chunk

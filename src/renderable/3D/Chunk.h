@@ -14,7 +14,6 @@ class Chunk
         int z;
 		bool loaded = false;
 		std::map<std::vector<int>, Block> blockData;
-        //std::vector<Block> blockData;
 		
 		// OpenGL attributes/buffers
 		unsigned int VAO;
