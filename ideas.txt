@@ -1,6 +1,4 @@
 Current item(s) to work on:
-
-  - Create debugScreen class that holds the fps counter and tick rate for now, more added later
   
   - Running wireframe mode gives us many many interior triangles per chunk, becuase depth testing is not
     culling, it is a per-pixel test to see which face is on top or closer to us. Experiment.
@@ -21,14 +19,10 @@ Current item(s) to work on:
 
   - Need to prevent the user from looking up or down past the flipping point. If we are within five degrees
     or something we need to prevent it from going further.
-
-  - System to take all cubes (eventually objects) we want to draw, map vertex info and indexing to a global
-    index. Then combine all the vertices into one array (keeping colors in mind as well) and draw with
-    glDrawElements. Size will be 36 times cube number, even with indexing.
   
   - Will we need to "cull" interior faces preemptively, or let OpenGL cull all faces in loaded chunks?
     For example ignore everything behind you, ignore all interior faces (lots of calcs, may not be worth on cpu)
 
-  - Remove colors from vertex shader (3D)
+  - Lighting (based on minecraft, block level, sky level, greater is chosen)
 
 Current method of polling for events can miss events. Need to switch the input handling to a callback in the future.

@@ -1,6 +1,8 @@
 #include "Chunk.h"
 
 #include <glad/glad.h>
+#include <map>
+#include <vector>
 #include "Block.h"
 
 
@@ -72,42 +74,53 @@ void Chunk::draw()
 }
 
 
+void Chunk::mesh()
+{
+	
+}
+
+
 Chunk::Chunk(int x, int z)
 {
     this -> x = x;
     this -> z = z;
-
+	
+	
     // Generate blocks
     int index = 0;
     for (int i=0; i<16; i++)
     {
-        for (int j=0; j<16; j++)
+        for (int k=0; k<16; k++)
         {
-            for (int k=0; k<16; k++)
+            for (int j=0; j<16; j++)
             {
-                blockData.push_back(Block(i+16*x, j, k+16*z));
-                blockData[index].setTextureCoords(512, 512, 0, 0, 16, 16); // Change this when block class implemented
+                blockData[std::vector<int>{i+16*x, j, k+16*z}] = Block(i+16*x, j, k+16*z);
+                blockData[std::vector<int>{i+16*x, j, k+16*z}].setTextureCoords(512, 512, 0, 0, 16, 16); // Change this when block class implemented
                 index++;
             }
         }
     }
 
     // Construct mesh on generation
-    for (int i=0; i<blockData.size(); i++)
+	std::map<std::vector<int>, Block>::iterator it;
+	int i=0;
+    for (it=blockData.begin(); it!=blockData.end(); it++)
 	{
-		for (int j=0; j<blockData[i].vertices.size(); j++)
+		// key is first, block is second
+		for (int j=0; j<it->second.vertices.size(); j++)
 		{
-			vertices.push_back(blockData[i].vertices[j]);
+			vertices.push_back(it->second.vertices[j]);
 		}
-		for (int j=0; j<blockData[i].texCoords.size(); j++)
+		for (int j=0; j<it->second.texCoords.size(); j++)
 		{
-			texCoords.push_back(blockData[i].texCoords[j]);
+			texCoords.push_back(it->second.texCoords[j]);
 		}
-		for (int j=0; j<blockData[i].indices.size(); j++)
+		for (int j=0; j<it->second.indices.size(); j++)
 		{
 			// 24 unique indices per block
-			indices.push_back(blockData[i].indices[j]+24*i);
+			indices.push_back(it->second.indices[j]+24*i);
 		}
+		i++; // number of blocks
 	}
 	
 	// Load data into buffers for rendering

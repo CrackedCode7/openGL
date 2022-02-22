@@ -6,6 +6,9 @@
 #include <GLFW/glfw3.h>
 
 
+Block::Block(){};
+
+
 Block::Block(float x, float y, float z)
 {
     this -> x = x;
@@ -13,6 +16,18 @@ Block::Block(float x, float y, float z)
     this -> z = z;
 
     vertices = {
+        0.0f+x, 0.0f+y, 1.0f+z,
+		0.0f+x, 0.0f+y, 1.0f+z,
+		0.0f+x, 0.0f+y, 1.0f+z,
+        1.0f+x, 0.0f+y, 1.0f+z,
+		1.0f+x, 0.0f+y, 1.0f+z,
+		1.0f+x, 0.0f+y, 1.0f+z,
+        1.0f+x, 1.0f+y, 1.0f+z,
+		1.0f+x, 1.0f+y, 1.0f+z,
+		1.0f+x, 1.0f+y, 1.0f+z,
+        0.0f+x, 1.0f+y, 1.0f+z,
+		0.0f+x, 1.0f+y, 1.0f+z,
+		0.0f+x, 1.0f+y, 1.0f+z,
         0.0f+x, 0.0f+y, 0.0f+z,
 		0.0f+x, 0.0f+y, 0.0f+z,
 		0.0f+x, 0.0f+y, 0.0f+z,
@@ -21,22 +36,10 @@ Block::Block(float x, float y, float z)
 		1.0f+x, 0.0f+y, 0.0f+z,
         1.0f+x, 1.0f+y, 0.0f+z,
 		1.0f+x, 1.0f+y, 0.0f+z,
-		1.0f+x, 1.0f+y, 0.0f+z,
+		1.0f+x, 1.0f+y, 0.0f+z,		
         0.0f+x, 1.0f+y, 0.0f+z,
 		0.0f+x, 1.0f+y, 0.0f+z,
-		0.0f+x, 1.0f+y, 0.0f+z,
-        0.0f+x, 0.0f+y, -1.0f+z,
-		0.0f+x, 0.0f+y, -1.0f+z,
-		0.0f+x, 0.0f+y, -1.0f+z,
-        1.0f+x, 0.0f+y, -1.0f+z,
-		1.0f+x, 0.0f+y, -1.0f+z,
-		1.0f+x, 0.0f+y, -1.0f+z,
-        1.0f+x, 1.0f+y, -1.0f+z,
-		1.0f+x, 1.0f+y, -1.0f+z,
-		1.0f+x, 1.0f+y, -1.0f+z,		
-        0.0f+x, 1.0f+y, -1.0f+z,
-		0.0f+x, 1.0f+y, -1.0f+z,
-		0.0f+x, 1.0f+y, -1.0f+z
+		0.0f+x, 1.0f+y, 0.0f+z
         };
 
     indices = {

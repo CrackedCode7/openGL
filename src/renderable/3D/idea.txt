@@ -1,0 +1,1 @@
+Chunks should use a map for easier block indexing. x, y, z starting block values

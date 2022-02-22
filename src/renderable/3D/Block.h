@@ -16,7 +16,8 @@ class Block
 		std::vector<float> texCoords;
         int textureWidth;
         int textureHeight;
-
+		
+		Block();
         Block(float x, float y, float z);
         void setTextureCoords(int textureWidth, int textureHeight, int posX, int posY, int sizeX, int sizeY);
 };

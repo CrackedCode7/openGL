@@ -13,7 +13,8 @@ class Chunk
         int x;
         int z;
 		bool loaded = false;
-        std::vector<Block> blockData;
+		std::map<std::vector<int>, Block> blockData;
+        //std::vector<Block> blockData;
 		
 		// OpenGL attributes/buffers
 		unsigned int VAO;
@@ -29,6 +30,9 @@ class Chunk
 		// Functions for loading/unloading (buffer creation/deletion)
 		void load();
 		void unload();
+		
+		// Meshing function
+		void mesh();
 		
 		// Drawing function
 		void draw();
