@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
 #include <cmath> // floor
 #include <string>
 
@@ -57,10 +58,15 @@ int main()
 
 
 	// Create chunks
-	std::vector<Chunk> chunks;
+	std::map<std::vector<int>, Chunk> chunks;
+	std::vector<Chunk*> loadedChunks;
 	for (int i=0; i<5; i++)
 	{
-		chunks.push_back(Chunk (i, 0));
+		for (int j=0; j<5; j++)
+		{
+			chunks[std::vector<int>{i, j}] = Chunk (i, j);
+			loadedChunks.push_back(&chunks[std::vector<int>{i, j}]);
+		}
 	}
 	
 	// Define UI elements
@@ -147,62 +153,26 @@ int main()
 			// ---------------------------------------------------------------------
 			playerChunkX = floor(camera.cameraPos[0] / 16);
 			playerChunkZ = floor(camera.cameraPos[2] / 16);
-			
+
 			if ((playerChunkX != lastPlayerChunkX) || (playerChunkZ != lastPlayerChunkZ))
 			{	
 				// Update last chunk to match current player chunk
 				lastPlayerChunkX = playerChunkX;
 				lastPlayerChunkZ = playerChunkZ;
-				/*
-				double meshTimeStart = glfwGetTime();
-				// Clear mesh
-				vertices.clear();
-				indices.clear();
-				texCoords.clear();
-				chunks.clear();
-				for (int i=0; i<5; i++)
-				{
-					float distance = sqrt(pow(playerChunkX-i, 2) + pow(playerChunkZ-0, 2));
-					if (distance < 10.0f)
-					{
-						chunks.push_back(Chunk (i, 0));
-					}
-				}
-				// Combine chunk verts, indices, and texCoords
-				int currentIndex = 0;
-				for (int i=0; i<chunks.size(); i++)
-				{
-					for (int j=0; j<chunks[i].vertices.size(); j++)
-					{
-						vertices.push_back(chunks[i].vertices[j]);
-					}
-					for (int j=0; j<chunks[i].texCoords.size(); j++)
-					{
-						texCoords.push_back(chunks[i].texCoords[j]);
-					}
-					for (int j=0; j<chunks[i].indices.size(); j++)
-					{
-						indices.push_back(chunks[i].indices[j]+currentIndex);
-					}
-					currentIndex += chunks[i].blockData.size()*24;
-				}
-				double meshTimeEnd = glfwGetTime();
-				double dataManipStart = meshTimeEnd;
-				// Send data to buffers
-				glBindVertexArray(VAO);
-				glBindBuffer(GL_ARRAY_BUFFER, VBO1);
-				glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), &vertices[0]);
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-				glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, indices.size() * sizeof(unsigned int), &indices[0]);
-				glBindBuffer(GL_ARRAY_BUFFER, VBO3);
-				glBufferSubData(GL_ARRAY_BUFFER, 0, texCoords.size() * sizeof(float), &texCoords[0]);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-				double dataManipEnd = glfwGetTime();
 				
-				std::cout << "Mesh time: " << meshTimeEnd-meshTimeStart << std::endl;
-				std::cout << "Data manipulation time: " << dataManipEnd-dataManipStart << std::endl;*/
+				for (int i=0; i<loadedChunks.size(); i++)
+				{
+					if (sqrt(pow((loadedChunks[i]->x-lastPlayerChunkX), 2) + pow((loadedChunks[i]->z-lastPlayerChunkZ), 2)) >= 5)
+					{
+						std::cout << "Unloaded chunk " << loadedChunks[i]->x << ", " << loadedChunks[i]->z << " While in chunk " 
+						<< playerChunkX << ", " << playerChunkZ << std::endl;
+						loadedChunks[i] -> unload();
+					}
+					else if (!loadedChunks[i] -> loaded)
+					{
+						loadedChunks[i] -> load();
+					}
+				}
 			}
 
 
@@ -226,9 +196,9 @@ int main()
 		// Bind Texture
 		glBindTexture(GL_TEXTURE_2D, texture.texture);
 		// Draw 3D
-		for (int i = 0; i<chunks.size(); i++)
+		for (int i = 0; i<loadedChunks.size(); i++)
 		{
-			chunks[i].draw();
+			loadedChunks[i] -> draw();
 		}
 		
 		// Draw UI
@@ -241,18 +211,6 @@ int main()
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
-
-	// Optionally de-allocate resources
-	// -----------------------------------------------------------------------------
-	//glDeleteVertexArrays(1, &VAO);
-	//glDeleteBuffers(1, &VBO1);
-	//glDeleteBuffers(1, &VBO2);
-	//glDeleteBuffers(1, &EBO);
-	//glDeleteVertexArrays(1, &UI_VAO);
-	//glDeleteBuffers(1, &UI_VBO1);
-	//glDeleteBuffers(1, &UI_VBO2);
-	//glDeleteBuffers(1, &UI_EBO);
 	
 
 	// Terminate glfw before the program ends

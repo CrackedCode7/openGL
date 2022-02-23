@@ -1,7 +1,6 @@
 Current item(s) to work on:
   
-  - Running wireframe mode gives us many many interior triangles per chunk, becuase depth testing is not
-    culling, it is a per-pixel test to see which face is on top or closer to us. Experiment.
+  - Chunks cull interior faces, except chunk borders. Also needs refactoring because lots of reused code
 
   - Work on chunk meshing and loading/unloading chunks efficiently. Store in memory
 	chunks which are loaded, if you need to load one, try to from file first, then

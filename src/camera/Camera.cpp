@@ -21,7 +21,7 @@ Camera::Camera(float x, float y, float z, int SCR_WIDTH, int SCR_HEIGHT)
     
     up = glm::vec3(0.0f, 1.0f, 0.0f);
 
-    projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH/(float)SCR_HEIGHT, 0.1f, 100.0f);
+    projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH/(float)SCR_HEIGHT, 0.1f, 1000.0f);
     model = glm::mat4(1.0f);
     
     recalculateMatrices();

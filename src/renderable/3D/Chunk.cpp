@@ -10,6 +10,9 @@
 
 void Chunk::load()
 {
+	// Update chunk state
+	loaded = true;
+
 	// Depends on data being there already (vertices, etc.)
 	// Set up OpenGL buffers
 	glGenVertexArrays(1, &VAO);
@@ -45,23 +48,20 @@ void Chunk::load()
 	// Unbind (don't need EBO because it is per VAO, not global state)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
-	
-	// Update chunk state
-	loaded = true;
 }
 
 
 void Chunk::unload()
 {
+	// Update chunk state
+	loaded = false;
+
 	// Delete arrays/buffers. The VAO, VBOs, and EBO can be reused when reloading
 	// Their values are set to 0, which means it is not a buffer object.
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &vertexVBO);
 	glDeleteBuffers(1, &textureVBO);
 	glDeleteBuffers(1, &EBO);
-	
-	// Update chunk state
-	loaded = false;
 }
 
 
@@ -181,6 +181,9 @@ void Chunk::mesh()
 		i++;
 	}
 }
+
+
+Chunk::Chunk(){};
 
 
 Chunk::Chunk(int x, int z)

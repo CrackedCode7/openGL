@@ -38,5 +38,6 @@ class Chunk
 		void draw();
 		
 		// Constructor
+		Chunk();
         Chunk(int x, int y);
 };
