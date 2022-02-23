@@ -69,29 +69,45 @@ void Camera::handleInput(GLFWwindow* window)
 	// W key
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
-		setCameraPos(cameraPos + transSpeed * cameraDirection);
-		setCameraTarget(cameraTarget + transSpeed * cameraDirection);
+		setCameraPos(cameraPos + glm::vec3(transSpeed * cameraDirection[0], 
+										   0,
+										   transSpeed * cameraDirection[2]));
+		setCameraTarget(cameraTarget + glm::vec3(transSpeed * cameraDirection[0], 
+												 0,
+												 transSpeed * cameraDirection[2]));
 		recalculate = true;
 	}
 	// A key
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
-		setCameraPos(cameraPos - transSpeed * cameraRight);
-		setCameraTarget(cameraTarget - transSpeed * cameraRight);
+		setCameraPos(cameraPos - glm::vec3(transSpeed * cameraRight[0],
+										   0,
+										   transSpeed * cameraRight[2]));
+		setCameraTarget(cameraTarget - glm::vec3(transSpeed * cameraRight[0],
+												 0,
+												 transSpeed * cameraRight[2]));
 		recalculate = true;
 	}
 	// S key
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
-		setCameraPos(cameraPos - transSpeed * cameraDirection);
-		setCameraTarget(cameraTarget - transSpeed * cameraDirection);
+		setCameraPos(cameraPos - glm::vec3(transSpeed * cameraDirection[0], 
+										   0,
+										   transSpeed * cameraDirection[2]));
+		setCameraTarget(cameraTarget - glm::vec3(transSpeed * cameraDirection[0], 
+												 0,
+												 transSpeed * cameraDirection[2]));
 		recalculate = true;
 	}
 	// D key
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
-		setCameraPos(cameraPos + transSpeed * cameraRight);
-		setCameraTarget(cameraTarget + transSpeed * cameraRight);
+		setCameraPos(cameraPos + glm::vec3(transSpeed * cameraRight[0],
+										   0,
+										   transSpeed * cameraRight[2]));
+		setCameraTarget(cameraTarget + glm::vec3(transSpeed * cameraRight[0],
+												 0,
+												 transSpeed * cameraRight[2]));
 		recalculate = true;
 	}
 	// Space bar
