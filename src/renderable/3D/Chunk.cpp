@@ -13,9 +13,7 @@ void Chunk::load()
 	// Update chunk state
 	loaded = true;
 
-	// Depends on data being there already (vertices, etc.)
 	// Set up OpenGL buffers
-	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &vertexVBO);
 	glGenBuffers(1, &textureVBO);
 	glGenBuffers(1, &EBO);
@@ -55,10 +53,22 @@ void Chunk::unload()
 {
 	// Update chunk state
 	loaded = false;
-
-	// Delete arrays/buffers. The VAO, VBOs, and EBO can be reused when reloading
+	
+	// Clear VAO for reuse
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	GLint maxAttrib;
+	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxAttrib);
+	for (int attribIx = 0; attribIx < maxAttrib; ++attribIx)
+	{
+		glDisableVertexAttribArray(attribIx);
+		glVertexAttribPointer(attribIx, 4, GL_FLOAT, GL_FALSE, 0, nullptr);
+		glVertexAttribDivisor(attribIx, 0);
+	}
+	
+	// Delete buffers. The VAO, VBOs, and EBO can be reused when reloading
 	// Their values are set to 0, which means it is not a buffer object.
-	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &vertexVBO);
 	glDeleteBuffers(1, &textureVBO);
 	glDeleteBuffers(1, &EBO);
@@ -209,6 +219,9 @@ Chunk::Chunk(int x, int z)
 
     // Construct mesh on generation
 	mesh();
+	
+	// Create VAO on chunk creation
+	glGenVertexArrays(1, &VAO);
 	
 	// Load data into buffers for rendering
 	// Assumes that when a chunk is generated it should be ready to render

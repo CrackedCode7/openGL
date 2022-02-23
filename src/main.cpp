@@ -60,9 +60,9 @@ int main()
 	// Create chunks
 	std::map<std::vector<int>, Chunk> chunks;
 	std::vector<Chunk*> loadedChunks;
-	for (int i=0; i<5; i++)
+	for (int i=-5; i<=5; i++)
 	{
-		for (int j=0; j<5; j++)
+		for (int j=-5; j<=5; j++)
 		{
 			chunks[std::vector<int>{i, j}] = Chunk (i, j);
 			loadedChunks.push_back(&chunks[std::vector<int>{i, j}]);
@@ -164,8 +164,6 @@ int main()
 				{
 					if (sqrt(pow((loadedChunks[i]->x-lastPlayerChunkX), 2) + pow((loadedChunks[i]->z-lastPlayerChunkZ), 2)) >= 5)
 					{
-						std::cout << "Unloaded chunk " << loadedChunks[i]->x << ", " << loadedChunks[i]->z << " While in chunk " 
-						<< playerChunkX << ", " << playerChunkZ << std::endl;
 						loadedChunks[i] -> unload();
 					}
 					else if (!loadedChunks[i] -> loaded)
