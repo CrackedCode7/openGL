@@ -4,8 +4,8 @@
 #include <GLFW/glfw3.h>
 
 
-unsigned int window::SCR_WIDTH = 160;
-unsigned int window::SCR_HEIGHT = 90;
+unsigned int window::SCR_WIDTH = 1600;
+unsigned int window::SCR_HEIGHT = 900;
 
 
 void window::framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -68,7 +68,7 @@ GLFWwindow* window::createWindow()
         glfwTerminate();
     }
 	glfwMakeContextCurrent(window); // Make new window current
-	glfwSwapInterval(1); // No V-sync
+	glfwSwapInterval(0); // No V-sync
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 	glfwSetCursorPos(window, SCR_WIDTH/2.0, SCR_HEIGHT/2.0); // cursor in middle

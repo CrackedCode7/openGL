@@ -32,6 +32,7 @@ class Chunk
 		
 		// Meshing function
 		void mesh();
+		bool findBlockDataKey(std::vector<int> pos);
 		
 		// Drawing function
 		void draw();

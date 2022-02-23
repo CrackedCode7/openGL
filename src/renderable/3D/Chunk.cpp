@@ -5,6 +5,8 @@
 #include <vector>
 #include "Block.h"
 
+#include <iostream>
+
 
 void Chunk::load()
 {
@@ -74,6 +76,19 @@ void Chunk::draw()
 }
 
 
+bool Chunk::findBlockDataKey(std::vector<int> pos)
+{
+	if (blockData.count(pos))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+
 void Chunk::mesh()
 {
 	std::map<std::vector<int>, Block>::iterator it;
@@ -81,6 +96,8 @@ void Chunk::mesh()
     for (it=blockData.begin(); it!=blockData.end(); it++)
 	{
 		// key is first, block is second
+
+		// Add all vertices and texture coords, only add indices if face should be rendered.
 		for (int j=0; j<it->second.vertices.size(); j++)
 		{
 			vertices.push_back(it->second.vertices[j]);
@@ -89,12 +106,79 @@ void Chunk::mesh()
 		{
 			texCoords.push_back(it->second.texCoords[j]);
 		}
-		for (int j=0; j<it->second.indices.size(); j++)
+
+		// Check faces and add appropriate indices
+		int x = it->first[0];
+		int y = it->first[1];
+		int z = it->first[2];
+		// Front face
+		if (!findBlockDataKey(std::vector<int>{x, y, z+1}))
 		{
-			// 24 unique indices per block
-			indices.push_back(it->second.indices[j]+24*i);
+			// Render, add 6 indices
+			indices.push_back(it->second.indices[0]+24*i);
+			indices.push_back(it->second.indices[1]+24*i);
+			indices.push_back(it->second.indices[2]+24*i);
+			indices.push_back(it->second.indices[3]+24*i);
+			indices.push_back(it->second.indices[4]+24*i);
+			indices.push_back(it->second.indices[5]+24*i);
 		}
-		i++; // number of blocks
+		// Right face
+		if (!findBlockDataKey(std::vector<int>{x+1, y, z}))
+		{
+			// Render, add 6 indices
+			indices.push_back(it->second.indices[6]+24*i);
+			indices.push_back(it->second.indices[7]+24*i);
+			indices.push_back(it->second.indices[8]+24*i);
+			indices.push_back(it->second.indices[9]+24*i);
+			indices.push_back(it->second.indices[10]+24*i);
+			indices.push_back(it->second.indices[11]+24*i);
+		}
+		// Top face
+		if (!findBlockDataKey(std::vector<int>{x, y+1, z}))
+		{
+			// Render, add 6 indices
+			indices.push_back(it->second.indices[12]+24*i);
+			indices.push_back(it->second.indices[13]+24*i);
+			indices.push_back(it->second.indices[14]+24*i);
+			indices.push_back(it->second.indices[15]+24*i);
+			indices.push_back(it->second.indices[16]+24*i);
+			indices.push_back(it->second.indices[17]+24*i);
+		}
+		// Left face
+		if (!findBlockDataKey(std::vector<int>{x-1, y, z}))
+		{
+			// Render, add 6 indices
+			indices.push_back(it->second.indices[18]+24*i);
+			indices.push_back(it->second.indices[19]+24*i);
+			indices.push_back(it->second.indices[20]+24*i);
+			indices.push_back(it->second.indices[21]+24*i);
+			indices.push_back(it->second.indices[22]+24*i);
+			indices.push_back(it->second.indices[23]+24*i);
+		}
+		// Back face
+		if (!findBlockDataKey(std::vector<int>{x, y, z-1}))
+		{
+			// Render, add 6 indices
+			indices.push_back(it->second.indices[24]+24*i);
+			indices.push_back(it->second.indices[25]+24*i);
+			indices.push_back(it->second.indices[26]+24*i);
+			indices.push_back(it->second.indices[27]+24*i);
+			indices.push_back(it->second.indices[28]+24*i);
+			indices.push_back(it->second.indices[29]+24*i);
+		}
+		// Bottom face
+		if (!findBlockDataKey(std::vector<int>{x, y-1, z}))
+		{
+			// Render, add 6 indices
+			indices.push_back(it->second.indices[30]+24*i);
+			indices.push_back(it->second.indices[31]+24*i);
+			indices.push_back(it->second.indices[32]+24*i);
+			indices.push_back(it->second.indices[33]+24*i);
+			indices.push_back(it->second.indices[34]+24*i);
+			indices.push_back(it->second.indices[35]+24*i);
+		}
+
+		i++;
 	}
 }
 
