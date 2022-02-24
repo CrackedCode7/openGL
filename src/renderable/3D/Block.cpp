@@ -93,29 +93,29 @@ void Block::setTextureCoords(int textureWidth, int textureHeight, int posX, int 
 
 	// Sides utilize the first texture from atlas at posX, posY then top then bottom offset by sizes 
 	texCoords = {
-		(float)posX/textureWidth, (float)(textureHeight-posY-sizeY)/textureHeight,				// 0
-		(float)(posX+sizeX)/textureWidth, (float)(textureHeight-posY-sizeY)/textureHeight, 		// 1
-		(float)(posX+2*sizeX)/textureWidth, (float)(textureHeight-posY)/textureHeight, 			// 2
-		(float)(posX+sizeX)/textureWidth, (float)(textureHeight-posY-sizeY)/textureHeight, 		// 3
-		(float)posX/textureWidth, (float)(textureHeight-posY-sizeY)/textureHeight, 				// 4
-		(float)(posX+3*sizeX)/textureWidth, (float)(textureHeight-posY)/textureHeight, 			// 5
-		(float)(posX+sizeX)/textureWidth, (float)(textureHeight-posY)/textureHeight, 			// 6
-		(float)posX/textureWidth, (float)(textureHeight-posY)/textureHeight, 					// 7
-		(float)(posX+2*sizeX)/textureWidth, (float)(textureHeight-posY-sizeY)/textureHeight, 	// 8
-		(float)posX/textureWidth, (float)(textureHeight-posY)/textureHeight, 					// 9
-		(float)(posX+sizeX)/textureWidth, (float)(textureHeight-posY-sizeY)/textureHeight, 		// 10
-		(float)(posX+sizeX)/textureWidth, (float)(textureHeight-posY)/textureHeight, 			// 11
-		(float)posX/textureWidth, (float)(textureHeight-posY-sizeY)/textureHeight, 				// 12
-		(float)(posX+sizeX)/textureWidth, (float)(textureHeight-posY-sizeY)/textureHeight, 		// 13
-		(float)(posX+2*sizeX)/textureWidth, (float)(textureHeight-posY-sizeY)/textureHeight, 	// 14
-		(float)(posX+sizeX)/textureWidth, (float)(textureHeight-posY-sizeY)/textureHeight, 		// 15
-		(float)posX/textureWidth, (float)(textureHeight-posY-sizeY)/textureHeight, 				// 16
-		(float)(posX+3*sizeX)/textureWidth, (float)(textureHeight-posY-sizeY)/textureHeight, 	// 17
-		(float)(posX+sizeX)/textureWidth, (float)(textureHeight-posY)/textureHeight, 			// 18
-		(float)(posX+2*sizeX)/textureWidth, (float)(textureHeight-posY)/textureHeight, 			// 19
-		(float)posX/textureWidth, (float)(textureHeight-posY)/textureHeight, 					// 20
-		(float)(posX+sizeX)/textureWidth, (float)(textureHeight-posY)/textureHeight, 			// 21
-		(float)posX/textureWidth, (float)(textureHeight-posY)/textureHeight, 					// 22
-		(float)(posX+sizeX)/textureWidth, (float)(textureHeight-posY)/textureHeight, 			// 23
+		(float)posX, (float)(textureHeight-posY-sizeY),				// 0
+		(float)(posX+sizeX), (float)(textureHeight-posY-sizeY), 	// 1
+		(float)(posX+2*sizeX), (float)(textureHeight-posY), 		// 2
+		(float)(posX+sizeX), (float)(textureHeight-posY-sizeY), 	// 3
+		(float)posX, (float)(textureHeight-posY-sizeY), 			// 4
+		(float)(posX+3*sizeX), (float)(textureHeight-posY), 		// 5
+		(float)(posX+sizeX), (float)(textureHeight-posY), 			// 6
+		(float)posX, (float)(textureHeight-posY), 					// 7
+		(float)(posX+2*sizeX), (float)(textureHeight-posY-sizeY), 	// 8
+		(float)posX, (float)(textureHeight-posY), 					// 9
+		(float)(posX+sizeX), (float)(textureHeight-posY-sizeY), 	// 10
+		(float)(posX+sizeX), (float)(textureHeight-posY), 			// 11
+		(float)posX, (float)(textureHeight-posY-sizeY), 			// 12
+		(float)(posX+sizeX), (float)(textureHeight-posY-sizeY), 	// 13
+		(float)(posX+2*sizeX), (float)(textureHeight-posY-sizeY), 	// 14
+		(float)(posX+sizeX), (float)(textureHeight-posY-sizeY), 	// 15
+		(float)posX, (float)(textureHeight-posY-sizeY), 			// 16
+		(float)(posX+3*sizeX), (float)(textureHeight-posY-sizeY), 	// 17
+		(float)(posX+sizeX), (float)(textureHeight-posY), 			// 18
+		(float)(posX+2*sizeX), (float)(textureHeight-posY), 		// 19
+		(float)posX, (float)(textureHeight-posY), 					// 20
+		(float)(posX+sizeX), (float)(textureHeight-posY), 			// 21
+		(float)posX, (float)(textureHeight-posY), 					// 22
+		(float)(posX+sizeX), (float)(textureHeight-posY), 			// 23
 	};
 }

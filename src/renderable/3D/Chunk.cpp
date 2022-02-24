@@ -1,6 +1,7 @@
 #include "Chunk.h"
 
 #include <glad/glad.h>
+#include <GLFW/glfw3.h> // glfwGetTime()
 #include <map>
 #include <vector>
 #include "Block.h"
@@ -201,7 +202,7 @@ Chunk::Chunk(int x, int z)
     this -> x = x;
     this -> z = z;
 	
-	
+	double startTime = glfwGetTime();
     // Generate blocks
     int index = 0;
     for (int i=0; i<16; i++)
@@ -216,9 +217,11 @@ Chunk::Chunk(int x, int z)
             }
         }
     }
+	double genTime = glfwGetTime();
 
     // Construct mesh on generation
 	mesh();
+	double meshTime = glfwGetTime();
 	
 	// Create VAO on chunk creation
 	glGenVertexArrays(1, &VAO);
@@ -226,4 +229,9 @@ Chunk::Chunk(int x, int z)
 	// Load data into buffers for rendering
 	// Assumes that when a chunk is generated it should be ready to render
 	load();
+	double loadTime = glfwGetTime();
+	
+	//std::cout << "Generating chunk took " << genTime-startTime << std::endl;
+	//std::cout << "Generating mesh took " << meshTime-genTime << std::endl;
+	//std::cout << "Loading chunk took " << loadTime-meshTime << std::endl;
 }

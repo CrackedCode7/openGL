@@ -191,7 +191,9 @@ int main()
 		ourShader.setMat4("model", camera.model);
 		ourShader.setMat4("view", camera.view);
 		ourShader.setMat4("projection", camera.projection);
-		// Bind Texture
+		// Setup uniforms in fragment shader
+		ourShader.setVec2("textureSize", glm::vec2((float)texture.width, (float)texture.height));
+		// Bind Texture (texture uniform, frag shader)
 		glBindTexture(GL_TEXTURE_2D, texture.texture);
 		// Draw 3D
 		for (int i = 0; i<loadedChunks.size(); i++)
