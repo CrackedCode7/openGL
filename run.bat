@@ -1,1 +1,1 @@
-cmd.exe /k "main.exe"
+cmd.exe /k "build\main.exe"

@@ -5,6 +5,7 @@
 #include <map>
 #include <vector>
 #include "Block.h"
+#include "src/util/util.h"
 
 #include <iostream>
 
@@ -79,11 +80,20 @@ void Chunk::draw()
 }
 
 
-bool Chunk::findBlockDataKey(std::vector<int> pos)
+bool Chunk::findBlock(int x, int y, int z)
 {
-	if (blockData.count(pos))
+	std::cout << x << " " << y << " " << z << std::endl;
+	if ( (x >= 0 && x < xSize) && (y >= 0 && y < ySize) && (z >= 0 && z < zSize) )
 	{
-		return true;
+		int index = x + xSize * z + xSize * zSize * y;
+		if (!blockData[index].transparent)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 	else
 	{
@@ -94,68 +104,66 @@ bool Chunk::findBlockDataKey(std::vector<int> pos)
 
 void Chunk::mesh()
 {
-	std::map<std::vector<int>, Block>::iterator it;
-	int i=0;
-    for (it=blockData.begin(); it!=blockData.end(); it++)
+    for (int i=0; i<blockData.size(); i++)
 	{
 		// key is first, block is second
 
 		// Check faces and add appropriate indices
-		int x = it->first[0];
-		int y = it->first[1];
-		int z = it->first[2];
+		int x = positiveModulo(blockData[i].x, xSize);
+		int y = blockData[i].y;
+		int z = positiveModulo(blockData[i].z, zSize);
 		// Front face
-		if (!findBlockDataKey(std::vector<int>{x, y, z+1}))
+		if (!findBlock(x, y, z+1))
 		{
-			std::vector<float> faceVerts = it->second.getFrontFaceVertices();
+			std::vector<float> faceVerts = blockData[i].getFrontFaceVertices();
 			vertices.insert(vertices.end(), faceVerts.begin(), faceVerts.end());
 			
-			std::vector<float> faceTexCoords = it->second.getFrontFaceTexCoords();
+			std::vector<float> faceTexCoords = blockData[i].getFrontFaceTexCoords();
 			texCoords.insert(texCoords.end(), faceTexCoords.begin(), faceTexCoords.end());
 		}
 		// Right face
-		if (!findBlockDataKey(std::vector<int>{x+1, y, z}))
+		if (!findBlock(x+1, y, z))
 		{
-			std::vector<float> faceVerts = it->second.getRightFaceVertices();
+			std::vector<float> faceVerts = blockData[i].getRightFaceVertices();
 			vertices.insert(vertices.end(), faceVerts.begin(), faceVerts.end());
 			
-			std::vector<float> faceTexCoords = it->second.getRightFaceTexCoords();
+			std::vector<float> faceTexCoords = blockData[i].getRightFaceTexCoords();
 			texCoords.insert(texCoords.end(), faceTexCoords.begin(), faceTexCoords.end());
 		}
 		// Top face
-		if (!findBlockDataKey(std::vector<int>{x, y+1, z}))
+		if (!findBlock(x, y+1, z))
 		{
-			std::vector<float> faceVerts = it->second.getTopFaceVertices();
+			std::vector<float> faceVerts = blockData[i].getTopFaceVertices();
 			vertices.insert(vertices.end(), faceVerts.begin(), faceVerts.end());
 			
-			std::vector<float> faceTexCoords = it->second.getTopFaceTexCoords();
+			std::vector<float> faceTexCoords = blockData[i].getTopFaceTexCoords();
 			texCoords.insert(texCoords.end(), faceTexCoords.begin(), faceTexCoords.end());
 		}
 		// Left face
-		if (!findBlockDataKey(std::vector<int>{x-1, y, z}))
+		if (!findBlock(x-1, y, z))
 		{
-			std::vector<float> faceVerts = it->second.getLeftFaceVertices();
+			std::vector<float> faceVerts = blockData[i].getLeftFaceVertices();
 			vertices.insert(vertices.end(), faceVerts.begin(), faceVerts.end());
 			
-			std::vector<float> faceTexCoords = it->second.getLeftFaceTexCoords();
+			std::vector<float> faceTexCoords = blockData[i].getLeftFaceTexCoords();
 			texCoords.insert(texCoords.end(), faceTexCoords.begin(), faceTexCoords.end());
 		}
 		// Back face
-		if (!findBlockDataKey(std::vector<int>{x, y, z-1}))
+		if (!findBlock(x, y, z-1))
 		{
-			std::vector<float> faceVerts = it->second.getBackFaceVertices();
+			std::vector<float> faceVerts = blockData[i].getBackFaceVertices();
 			vertices.insert(vertices.end(), faceVerts.begin(), faceVerts.end());
 			
-			std::vector<float> faceTexCoords = it->second.getBackFaceTexCoords();
+			std::vector<float> faceTexCoords = blockData[i].getBackFaceTexCoords();
 			texCoords.insert(texCoords.end(), faceTexCoords.begin(), faceTexCoords.end());
 		}
 		// Bottom face
-		if (!findBlockDataKey(std::vector<int>{x, y-1, z}))
+		if (!findBlock(x, y-1, z))
 		{
-			std::vector<float> faceVerts = it->second.getBottomFaceVertices();
+			std::vector<float> faceVerts = blockData[i].getBottomFaceVertices();
 			vertices.insert(vertices.end(), faceVerts.begin(), faceVerts.end());
 			
-			std::vector<float> faceTexCoords = it->second.getBottomFaceTexCoords();
+			std::vector<float> faceTexCoords = blockData[i].getBottomFaceTexCoords();
 			texCoords.insert(texCoords.end(), faceTexCoords.begin(), faceTexCoords.end());
 		}
 	}
@@ -179,7 +187,7 @@ Chunk::Chunk(int x, int z)
         {
             for (int j=0; j<16; j++)
             {
-                blockData[std::vector<int>{i+16*x, j, k+16*z}] = Block(i+16*x, j, k+16*z);
+                blockData.push_back(Block(i+16*x, j, k+16*z));
                 index++;
             }
         }
@@ -188,8 +196,8 @@ Chunk::Chunk(int x, int z)
 
     // Construct mesh on generation
 	// Pre-allocate memory for testing
-	vertices.reserve(16*16*16*24*3);
-	texCoords.reserve(16 * 16 * 16 * 24*3);
+	//vertices.reserve(16*16*16*24*3);
+	//texCoords.reserve(16 * 16 * 16 * 24*3);
 	mesh();
 	double meshTime = glfwGetTime();
 	

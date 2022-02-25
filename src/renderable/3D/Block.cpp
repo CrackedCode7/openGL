@@ -186,7 +186,7 @@ std::vector<float> Block::getBottomFaceTexCoords()
 }
 
 
-Block::Block(float x, float y, float z)
+Block::Block(int x, int y, int z)
 {
 	this->x = x;
 	this->y = y;

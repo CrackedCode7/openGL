@@ -12,8 +12,11 @@ class Chunk
 		// General attributes
         int x;
         int z;
+		int xSize = 16;
+		int ySize = 16;
+		int zSize = 16;
 		bool loaded = false;
-		std::map<std::vector<int>, Block> blockData;
+		std::vector<Block> blockData;
 		
 		// OpenGL attributes/buffers
 		unsigned int VAO;
@@ -30,7 +33,7 @@ class Chunk
 		
 		// Meshing function
 		void mesh();
-		bool findBlockDataKey(std::vector<int> pos);
+		bool findBlock(int x, int y, int z);
 		
 		// Drawing function
 		void draw();

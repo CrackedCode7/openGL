@@ -6,10 +6,11 @@
 class Block
 {
     public:
-		// Block position
-        float x;
-        float y;
-        float z;
+		// Block position/atttibutes
+        int x;
+        int y;
+        int z;
+		bool transparent = false;
 		
 		// Texture attributes
 		int posX = 0;
@@ -35,5 +36,5 @@ class Block
 		
 		// Constructors
 		Block();
-        Block(float x, float y, float z);
+        Block(int x, int y, int z);
 };
