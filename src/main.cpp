@@ -60,9 +60,9 @@ int main()
 	// Create chunks
 	std::map<std::vector<int>, Chunk> chunks;
 	std::vector<Chunk*> loadedChunks;
-	for (int i=-5; i<=5; i++)
+	for (int i=-3; i<=3; i++)
 	{
-		for (int j=-5; j<=5; j++)
+		for (int j=-3; j<=3; j++)
 		{
 			chunks[std::vector<int>{i, j}] = Chunk (i, j);
 			loadedChunks.push_back(&chunks[std::vector<int>{i, j}]);
@@ -81,10 +81,10 @@ int main()
 	// Set up perspective projection, view, and model matrices
 	// -----------------------------------------------------------------------------
 	Camera camera(0.0f, 20.0f, -5.0f, window::SCR_WIDTH, window::SCR_HEIGHT);
-	int lastPlayerChunkX = floor(camera.cameraPos[0]);
-	int playerChunkX = floor(camera.cameraPos[0]);
-	int lastPlayerChunkZ = floor(camera.cameraPos[1]);
-	int playerChunkZ = floor(camera.cameraPos[1]);
+	int lastPlayerChunkX = (int)floor(camera.cameraPos[0]);
+	int playerChunkX = (int)floor(camera.cameraPos[0]);
+	int lastPlayerChunkZ = (int)floor(camera.cameraPos[1]);
+	int playerChunkZ = (int)floor(camera.cameraPos[1]);
 
 
 	// OpenGL setup functions
@@ -151,8 +151,8 @@ int main()
 
 			// Chunk removal
 			// ---------------------------------------------------------------------
-			playerChunkX = floor(camera.cameraPos[0] / 16);
-			playerChunkZ = floor(camera.cameraPos[2] / 16);
+			playerChunkX = (int)floor(camera.cameraPos[0] / 16);
+			playerChunkZ = (int)floor(camera.cameraPos[2] / 16);
 
 			if ((playerChunkX != lastPlayerChunkX) || (playerChunkZ != lastPlayerChunkZ))
 			{	
@@ -162,7 +162,7 @@ int main()
 				
 				for (int i=0; i<loadedChunks.size(); i++)
 				{
-					if (sqrt(pow((loadedChunks[i]->x-lastPlayerChunkX), 2) + pow((loadedChunks[i]->z-lastPlayerChunkZ), 2)) >= 5)
+					if (sqrt(pow((loadedChunks[i]->x-lastPlayerChunkX), 2) + pow((loadedChunks[i]->z-lastPlayerChunkZ), 2)) >= 3)
 					{
 						loadedChunks[i] -> unload();
 					}

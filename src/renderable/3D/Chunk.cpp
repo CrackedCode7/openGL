@@ -220,6 +220,10 @@ Chunk::Chunk(int x, int z)
 	double genTime = glfwGetTime();
 
     // Construct mesh on generation
+	// Pre-allocate memory for testing
+	vertices.reserve(16*16*16*24*3);
+	indices.reserve(16 * 16 * 16 * 36);
+	texCoords.reserve(16 * 16 * 16 * 24*3);
 	mesh();
 	double meshTime = glfwGetTime();
 	
@@ -231,7 +235,7 @@ Chunk::Chunk(int x, int z)
 	load();
 	double loadTime = glfwGetTime();
 	
-	//std::cout << "Generating chunk took " << genTime-startTime << std::endl;
-	//std::cout << "Generating mesh took " << meshTime-genTime << std::endl;
-	//std::cout << "Loading chunk took " << loadTime-meshTime << std::endl;
+	std::cout << "Generating chunk took " << genTime-startTime << std::endl;
+	std::cout << "Generating mesh took " << meshTime-genTime << std::endl;
+	std::cout << "Loading chunk took " << loadTime-meshTime << std::endl;
 }
