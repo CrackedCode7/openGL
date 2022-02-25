@@ -4,8 +4,8 @@
 #include <GLFW/glfw3.h>
 
 
-unsigned int window::SCR_WIDTH = 160;
-unsigned int window::SCR_HEIGHT = 90;
+unsigned int window::SCR_WIDTH = 800;
+unsigned int window::SCR_HEIGHT = 450;
 
 
 void window::framebuffer_size_callback(GLFWwindow* window, int width, int height)

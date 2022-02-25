@@ -162,7 +162,7 @@ int main()
 				
 				for (int i=0; i<loadedChunks.size(); i++)
 				{
-					if (sqrt(pow((loadedChunks[i]->x-lastPlayerChunkX), 2) + pow((loadedChunks[i]->z-lastPlayerChunkZ), 2)) >= 3)
+					if (sqrt(pow((loadedChunks[i]->x-lastPlayerChunkX), 2) + pow((loadedChunks[i]->z-lastPlayerChunkZ), 2)) >= 5)
 					{
 						loadedChunks[i] -> unload();
 					}

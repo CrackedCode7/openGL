@@ -10,18 +10,18 @@ class Chunk
 {
     public:
 		// General attributes
-        int x;
-        int z;
+        int x = 0;
+        int z = 0;
 		int xSize = 16;
-		int ySize = 16;
+		int ySize = 32;
 		int zSize = 16;
 		bool loaded = false;
 		std::vector<Block> blockData;
 		
 		// OpenGL attributes/buffers
-		unsigned int VAO;
-		unsigned int vertexVBO;
-		unsigned int textureVBO;
+		unsigned int VAO = 0;
+		unsigned int vertexVBO = 0;
+		unsigned int textureVBO = 0;
 		
 		// Buffer data storage attributes
         std::vector<float> vertices;

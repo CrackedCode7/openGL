@@ -82,7 +82,6 @@ void Chunk::draw()
 
 bool Chunk::findBlock(int x, int y, int z)
 {
-	std::cout << x << " " << y << " " << z << std::endl;
 	if ( (x >= 0 && x < xSize) && (y >= 0 && y < ySize) && (z >= 0 && z < zSize) )
 	{
 		int index = x + xSize * z + xSize * zSize * y;
@@ -95,6 +94,7 @@ bool Chunk::findBlock(int x, int y, int z)
 			return false;
 		}
 	}
+	// Out of range means we need to check the neighboring chunks if we want to cull chunk boundaries
 	else
 	{
 		return false;
@@ -181,11 +181,11 @@ Chunk::Chunk(int x, int z)
 	double startTime = glfwGetTime();
     // Generate blocks
     int index = 0;
-    for (int i=0; i<16; i++)
+    for (int j=0; j<ySize; j++)
     {
-        for (int k=0; k<16; k++)
+        for (int k=0; k<zSize; k++)
         {
-            for (int j=0; j<16; j++)
+            for (int i=0; i<xSize; i++)
             {
                 blockData.push_back(Block(i+16*x, j, k+16*z));
                 index++;
@@ -195,9 +195,6 @@ Chunk::Chunk(int x, int z)
 	double genTime = glfwGetTime();
 
     // Construct mesh on generation
-	// Pre-allocate memory for testing
-	//vertices.reserve(16*16*16*24*3);
-	//texCoords.reserve(16 * 16 * 16 * 24*3);
 	mesh();
 	double meshTime = glfwGetTime();
 	

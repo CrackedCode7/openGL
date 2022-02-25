@@ -13,7 +13,7 @@ float yPixelToScreenCoords(float yPixel, float yScreenSize)
 }
 
 
-int positveModulo(int x, int N)
+int positiveModulo(int x, int N)
 {
 	return (x % N + N) % N;
 }
