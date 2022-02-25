@@ -6,46 +6,183 @@
 #include <GLFW/glfw3.h>
 
 
-Block::Block() {};
-
-
 std::vector<float> Block::getFrontFaceVertices()
 {
-	std::vector<float> vertices;
-
-	vertices.push_back(0.0f + x); // 0
-	vertices.push_back(0.0f + y); // 0
-	vertices.push_back(1.0f + z); // 0
-
-	vertices.push_back(1.0f + x); // 3
-	vertices.push_back(0.0f + y); // 3
-	vertices.push_back(1.0f + z); // 3
-
-	vertices.push_back(1.0f + x); // 6
-	vertices.push_back(1.0f + y); // 6
-	vertices.push_back(1.0f + z); // 6
-
-	vertices.push_back(0.0f + x); // 0
-	vertices.push_back(0.0f + y); // 0
-	vertices.push_back(1.0f + z); // 0
-
-	vertices.push_back(1.0f + x); // 6
-	vertices.push_back(1.0f + y); // 6
-	vertices.push_back(1.0f + z); // 6
-
-	vertices.push_back(0.0f + x); // 9
-	vertices.push_back(1.0f + y); // 9
-	vertices.push_back(1.0f + z); // 9
+	std::vector<float> vertices = {
+		0.0f + x, 0.0f + y, 1.0f + z, // 0
+		1.0f + x, 0.0f + y, 1.0f + z, // 3
+		1.0f + x, 1.0f + y, 1.0f + z, // 6
+		0.0f + x, 0.0f + y, 1.0f + z, // 0
+		1.0f + x, 1.0f + y, 1.0f + z, // 6
+		0.0f + x, 1.0f + y, 1.0f + z, // 9
+	};	
 
 	return vertices;
 }
 
 
-std::vector<float> getFrontFaceIndices()
+std::vector<float> Block::getFrontFaceTexCoords()
 {
-	std::vector<float> indices;
+	std::vector<float> texCoords = {
+		(float)posX, (float)(textureHeight - posY - sizeY),				// 0
+		(float)(posX + sizeX), (float)(textureHeight - posY - sizeY), 	// 3
+		(float)(posX + sizeX), (float)(textureHeight - posY), 			// 6
+		(float)posX, (float)(textureHeight - posY - sizeY),				// 0
+		(float)(posX + sizeX), (float)(textureHeight - posY), 			// 6
+		(float)posX, (float)(textureHeight - posY), 					// 9
+	};
 
-	indices.push_back(0);
+	return texCoords;
+}
+
+
+std::vector<float> Block::getRightFaceVertices()
+{
+	std::vector<float> vertices = {
+		1.0f + x, 0.0f + y, 1.0f + z, // 4 
+		1.0f + x, 0.0f + y, 0.0f + z, // 15
+		1.0f + x, 1.0f + y, 0.0f + z, // 18
+		1.0f + x, 0.0f + y, 1.0f + z, // 4 
+		1.0f + x, 1.0f + y, 0.0f + z, // 18
+		1.0f + x, 1.0f + y, 1.0f + z, // 7
+	};
+	
+	return vertices;
+}
+
+
+std::vector<float> Block::getRightFaceTexCoords()
+{
+	std::vector<float> texCoords = {
+		(float)posX, (float)(textureHeight - posY - sizeY), 			// 4
+		(float)(posX + sizeX), (float)(textureHeight - posY - sizeY), 	// 15
+		(float)(posX + sizeX), (float)(textureHeight - posY), 			// 18
+		(float)posX, (float)(textureHeight - posY - sizeY), 			// 4
+		(float)(posX + sizeX), (float)(textureHeight - posY), 			// 18
+		(float)posX, (float)(textureHeight - posY), 					// 7
+	};
+	
+	return texCoords;
+}
+
+
+std::vector<float> Block::getTopFaceVertices()
+{
+	std::vector<float> vertices = {
+		0.0f + x, 1.0f + y, 1.0f + z, // 10
+		1.0f + x, 1.0f + y, 1.0f + z, // 8
+		1.0f + x, 1.0f + y, 0.0f + z, // 19
+		0.0f + x, 1.0f + y, 1.0f + z, // 10
+		1.0f + x, 1.0f + y, 0.0f + z, // 19
+		0.0f + x, 1.0f + y, 0.0f + z, // 21
+	};
+	
+	return vertices;
+}
+
+
+std::vector<float> Block::getTopFaceTexCoords()
+{
+	std::vector<float> texCoords = {
+		(float)(posX + sizeX), (float)(textureHeight - posY - sizeY), 		// 10
+		(float)(posX + 2 * sizeX), (float)(textureHeight - posY - sizeY), 	// 8
+		(float)(posX + 2 * sizeX), (float)(textureHeight - posY), 			// 19
+		(float)(posX + sizeX), (float)(textureHeight - posY - sizeY), 		// 10
+		(float)(posX + 2 * sizeX), (float)(textureHeight - posY), 			// 19
+		(float)(posX + sizeX), (float)(textureHeight - posY), 				// 21
+	};
+	
+	return texCoords;
+}
+
+
+std::vector<float> Block::getLeftFaceVertices()
+{
+	std::vector<float> vertices = {
+		0.0f + x, 0.0f + y, 0.0f + z, // 12
+		0.0f + x, 0.0f + y, 1.0f + z, // 1
+		0.0f + x, 1.0f + y, 1.0f + z, // 11
+		0.0f + x, 0.0f + y, 0.0f + z, // 12
+		0.0f + x, 1.0f + y, 1.0f + z, // 11
+		0.0f + x, 1.0f + y, 0.0f + z, // 22
+	};
+	
+	return vertices;
+}
+
+
+std::vector<float> Block::getLeftFaceTexCoords()
+{
+	std::vector<float> texCoords = {
+		(float)posX, (float)(textureHeight - posY - sizeY), 			// 12
+		(float)(posX + sizeX), (float)(textureHeight - posY - sizeY), 	// 1
+		(float)(posX + sizeX), (float)(textureHeight - posY), 			// 11
+		(float)posX, (float)(textureHeight - posY - sizeY), 			// 12
+		(float)(posX + sizeX), (float)(textureHeight - posY), 			// 11
+		(float)posX, (float)(textureHeight - posY), 					// 22
+	};
+	
+	return texCoords;
+}
+
+
+std::vector<float> Block::getBackFaceVertices()
+{
+	std::vector<float> vertices = {
+		1.0f + x, 0.0f + y, 0.0f + z, // 16
+		0.0f + x, 0.0f + y, 0.0f + z, // 13
+		0.0f + x, 1.0f + y, 0.0f + z, // 23
+		1.0f + x, 0.0f + y, 0.0f + z, // 16
+		0.0f + x, 1.0f + y, 0.0f + z, // 23
+		1.0f + x, 1.0f + y, 0.0f + z, // 20
+	};
+	
+	return vertices;
+}
+
+
+std::vector<float> Block::getBackFaceTexCoords()
+{
+	std::vector<float> texCoords = {
+		(float)posX, (float)(textureHeight - posY - sizeY), 			// 16
+		(float)(posX + sizeX), (float)(textureHeight - posY - sizeY), 	// 13
+		(float)(posX + sizeX), (float)(textureHeight - posY), 			// 23
+		(float)posX, (float)(textureHeight - posY - sizeY), 			// 16
+		(float)(posX + sizeX), (float)(textureHeight - posY), 			// 23
+		(float)posX, (float)(textureHeight - posY), 					// 20
+	};
+	
+	return texCoords;
+}
+
+
+std::vector<float> Block::getBottomFaceVertices()
+{
+	std::vector<float> vertices = {
+		0.0f + x, 0.0f + y, 0.0f + z, // 14
+		1.0f + x, 0.0f + y, 0.0f + z, // 17
+		1.0f + x, 0.0f + y, 1.0f + z, // 5
+		0.0f + x, 0.0f + y, 0.0f + z, // 14
+		1.0f + x, 0.0f + y, 1.0f + z, // 5
+		0.0f + x, 0.0f + y, 1.0f + z, // 2
+	};
+	
+	return vertices;
+}
+
+
+std::vector<float> Block::getBottomFaceTexCoords()
+{
+	std::vector<float> texCoords = {
+		(float)(posX + 2 * sizeX), (float)(textureHeight - posY - sizeY), 	// 14
+		(float)(posX + 3 * sizeX), (float)(textureHeight - posY - sizeY), 	// 17
+		(float)(posX + 3 * sizeX), (float)(textureHeight - posY), 		// 5
+		(float)(posX + 2 * sizeX), (float)(textureHeight - posY - sizeY), 	// 14
+		(float)(posX + 3 * sizeX), (float)(textureHeight - posY), 		// 5
+		(float)(posX + 2 * sizeX), (float)(textureHeight - posY), 		// 2
+	};
+	
+	return texCoords;
 }
 
 
@@ -54,81 +191,7 @@ Block::Block(float x, float y, float z)
 	this->x = x;
 	this->y = y;
 	this->z = z;
-
-	vertices = {
-		0.0f + x, 0.0f + y, 1.0f + z, // 0
-		0.0f + x, 0.0f + y, 1.0f + z, // 1
-		0.0f + x, 0.0f + y, 1.0f + z, // 2
-		1.0f + x, 0.0f + y, 1.0f + z, // 3
-		1.0f + x, 0.0f + y, 1.0f + z, // 4 
-		1.0f + x, 0.0f + y, 1.0f + z, // 5
-		1.0f + x, 1.0f + y, 1.0f + z, // 6
-		1.0f + x, 1.0f + y, 1.0f + z, // 7
-		1.0f + x, 1.0f + y, 1.0f + z, // 8
-		0.0f + x, 1.0f + y, 1.0f + z, // 9
-		0.0f + x, 1.0f + y, 1.0f + z, // 10
-		0.0f + x, 1.0f + y, 1.0f + z, // 11
-		0.0f + x, 0.0f + y, 0.0f + z, // 12
-		0.0f + x, 0.0f + y, 0.0f + z, // 13
-		0.0f + x, 0.0f + y, 0.0f + z, // 14
-		1.0f + x, 0.0f + y, 0.0f + z, // 15
-		1.0f + x, 0.0f + y, 0.0f + z, // 16
-		1.0f + x, 0.0f + y, 0.0f + z, // 17
-		1.0f + x, 1.0f + y, 0.0f + z, // 18
-		1.0f + x, 1.0f + y, 0.0f + z, // 19
-		1.0f + x, 1.0f + y, 0.0f + z, // 20
-		0.0f + x, 1.0f + y, 0.0f + z, // 21
-		0.0f + x, 1.0f + y, 0.0f + z, // 22
-		0.0f + x, 1.0f + y, 0.0f + z  // 23
-	};
-
-	indices = {
-		0, 3, 6, // front
-		0, 6, 9, // front
-		4, 15, 18, // right
-		4, 18, 7, // right
-		10, 8, 19, // top
-		10, 19, 21, // top
-		12, 1, 11, // left
-		12, 11, 22, // left
-		16, 13, 23, // back
-		16, 23, 20, // back
-		14, 17, 5, // bottom
-		14, 5, 2 // bottom
-	};
 }
 
 
-void Block::setTextureCoords(int textureWidth, int textureHeight, int posX, int posY, int sizeX, int sizeY)
-{
-	this->textureWidth = textureWidth;
-	this->textureHeight = textureHeight;
-
-	// Sides utilize the first texture from atlas at posX, posY then top then bottom offset by sizes 
-	texCoords = {
-		(float)posX, (float)(textureHeight - posY - sizeY),				// 0
-		(float)(posX + sizeX), (float)(textureHeight - posY - sizeY), 	// 1
-		(float)(posX + 2 * sizeX), (float)(textureHeight - posY), 		// 2
-		(float)(posX + sizeX), (float)(textureHeight - posY - sizeY), 	// 3
-		(float)posX, (float)(textureHeight - posY - sizeY), 			// 4
-		(float)(posX + 3 * sizeX), (float)(textureHeight - posY), 		// 5
-		(float)(posX + sizeX), (float)(textureHeight - posY), 			// 6
-		(float)posX, (float)(textureHeight - posY), 					// 7
-		(float)(posX + 2 * sizeX), (float)(textureHeight - posY - sizeY), 	// 8
-		(float)posX, (float)(textureHeight - posY), 					// 9
-		(float)(posX + sizeX), (float)(textureHeight - posY - sizeY), 	// 10
-		(float)(posX + sizeX), (float)(textureHeight - posY), 			// 11
-		(float)posX, (float)(textureHeight - posY - sizeY), 			// 12
-		(float)(posX + sizeX), (float)(textureHeight - posY - sizeY), 	// 13
-		(float)(posX + 2 * sizeX), (float)(textureHeight - posY - sizeY), 	// 14
-		(float)(posX + sizeX), (float)(textureHeight - posY - sizeY), 	// 15
-		(float)posX, (float)(textureHeight - posY - sizeY), 			// 16
-		(float)(posX + 3 * sizeX), (float)(textureHeight - posY - sizeY), 	// 17
-		(float)(posX + sizeX), (float)(textureHeight - posY), 			// 18
-		(float)(posX + 2 * sizeX), (float)(textureHeight - posY), 		// 19
-		(float)posX, (float)(textureHeight - posY), 					// 20
-		(float)(posX + sizeX), (float)(textureHeight - posY), 			// 21
-		(float)posX, (float)(textureHeight - posY), 					// 22
-		(float)(posX + sizeX), (float)(textureHeight - posY), 			// 23
-	};
-}
+Block::Block() {};

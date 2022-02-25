@@ -17,23 +17,17 @@ void Chunk::load()
 	// Set up OpenGL buffers
 	glGenBuffers(1, &vertexVBO);
 	glGenBuffers(1, &textureVBO);
-	glGenBuffers(1, &EBO);
+	//glGenBuffers(1, &EBO);
 	
 	// VAO bound before setting up buffer data
 	glBindVertexArray(VAO);
-	// Indices
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 
-				 indices.size() * sizeof(unsigned int), 
-				 &indices[0], 
-				 GL_DYNAMIC_DRAW);
 	// Vertices
 	glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
 	glBufferData(GL_ARRAY_BUFFER, 
 				 vertices.size() * sizeof(float), 
 				 &vertices[0], 
 				 GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(unsigned int), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	// Texture Coordinates
 	glBindBuffer(GL_ARRAY_BUFFER, textureVBO);
@@ -44,7 +38,7 @@ void Chunk::load()
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(1);
 	
-	// Unbind (don't need EBO because it is per VAO, not global state)
+	// Unbind
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
@@ -57,7 +51,6 @@ void Chunk::unload()
 	
 	// Clear VAO for reuse
 	glBindVertexArray(VAO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	GLint maxAttrib;
 	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxAttrib);
@@ -68,11 +61,10 @@ void Chunk::unload()
 		glVertexAttribDivisor(attribIx, 0);
 	}
 	
-	// Delete buffers. The VAO, VBOs, and EBO can be reused when reloading
+	// Delete buffers. The VAO, VBOs can be reused when reloading
 	// Their values are set to 0, which means it is not a buffer object.
 	glDeleteBuffers(1, &vertexVBO);
 	glDeleteBuffers(1, &textureVBO);
-	glDeleteBuffers(1, &EBO);
 }
 
 
@@ -82,7 +74,7 @@ void Chunk::draw()
 	if (loaded)
 	{
 		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+		glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 	}
 }
 
@@ -108,16 +100,6 @@ void Chunk::mesh()
 	{
 		// key is first, block is second
 
-		// Add all vertices and texture coords, only add indices if face should be rendered.
-		for (int j=0; j<it->second.vertices.size(); j++)
-		{
-			vertices.push_back(it->second.vertices[j]);
-		}
-		for (int j=0; j<it->second.texCoords.size(); j++)
-		{
-			texCoords.push_back(it->second.texCoords[j]);
-		}
-
 		// Check faces and add appropriate indices
 		int x = it->first[0];
 		int y = it->first[1];
@@ -125,71 +107,57 @@ void Chunk::mesh()
 		// Front face
 		if (!findBlockDataKey(std::vector<int>{x, y, z+1}))
 		{
-			// Render, add 6 indices
-			indices.push_back(it->second.indices[0]+24*i);
-			indices.push_back(it->second.indices[1]+24*i);
-			indices.push_back(it->second.indices[2]+24*i);
-			indices.push_back(it->second.indices[3]+24*i);
-			indices.push_back(it->second.indices[4]+24*i);
-			indices.push_back(it->second.indices[5]+24*i);
+			std::vector<float> faceVerts = it->second.getFrontFaceVertices();
+			vertices.insert(vertices.end(), faceVerts.begin(), faceVerts.end());
+			
+			std::vector<float> faceTexCoords = it->second.getFrontFaceTexCoords();
+			texCoords.insert(texCoords.end(), faceTexCoords.begin(), faceTexCoords.end());
 		}
 		// Right face
 		if (!findBlockDataKey(std::vector<int>{x+1, y, z}))
 		{
-			// Render, add 6 indices
-			indices.push_back(it->second.indices[6]+24*i);
-			indices.push_back(it->second.indices[7]+24*i);
-			indices.push_back(it->second.indices[8]+24*i);
-			indices.push_back(it->second.indices[9]+24*i);
-			indices.push_back(it->second.indices[10]+24*i);
-			indices.push_back(it->second.indices[11]+24*i);
+			std::vector<float> faceVerts = it->second.getRightFaceVertices();
+			vertices.insert(vertices.end(), faceVerts.begin(), faceVerts.end());
+			
+			std::vector<float> faceTexCoords = it->second.getRightFaceTexCoords();
+			texCoords.insert(texCoords.end(), faceTexCoords.begin(), faceTexCoords.end());
 		}
 		// Top face
 		if (!findBlockDataKey(std::vector<int>{x, y+1, z}))
 		{
-			// Render, add 6 indices
-			indices.push_back(it->second.indices[12]+24*i);
-			indices.push_back(it->second.indices[13]+24*i);
-			indices.push_back(it->second.indices[14]+24*i);
-			indices.push_back(it->second.indices[15]+24*i);
-			indices.push_back(it->second.indices[16]+24*i);
-			indices.push_back(it->second.indices[17]+24*i);
+			std::vector<float> faceVerts = it->second.getTopFaceVertices();
+			vertices.insert(vertices.end(), faceVerts.begin(), faceVerts.end());
+			
+			std::vector<float> faceTexCoords = it->second.getTopFaceTexCoords();
+			texCoords.insert(texCoords.end(), faceTexCoords.begin(), faceTexCoords.end());
 		}
 		// Left face
 		if (!findBlockDataKey(std::vector<int>{x-1, y, z}))
 		{
-			// Render, add 6 indices
-			indices.push_back(it->second.indices[18]+24*i);
-			indices.push_back(it->second.indices[19]+24*i);
-			indices.push_back(it->second.indices[20]+24*i);
-			indices.push_back(it->second.indices[21]+24*i);
-			indices.push_back(it->second.indices[22]+24*i);
-			indices.push_back(it->second.indices[23]+24*i);
+			std::vector<float> faceVerts = it->second.getLeftFaceVertices();
+			vertices.insert(vertices.end(), faceVerts.begin(), faceVerts.end());
+			
+			std::vector<float> faceTexCoords = it->second.getLeftFaceTexCoords();
+			texCoords.insert(texCoords.end(), faceTexCoords.begin(), faceTexCoords.end());
 		}
 		// Back face
 		if (!findBlockDataKey(std::vector<int>{x, y, z-1}))
 		{
-			// Render, add 6 indices
-			indices.push_back(it->second.indices[24]+24*i);
-			indices.push_back(it->second.indices[25]+24*i);
-			indices.push_back(it->second.indices[26]+24*i);
-			indices.push_back(it->second.indices[27]+24*i);
-			indices.push_back(it->second.indices[28]+24*i);
-			indices.push_back(it->second.indices[29]+24*i);
+			std::vector<float> faceVerts = it->second.getBackFaceVertices();
+			vertices.insert(vertices.end(), faceVerts.begin(), faceVerts.end());
+			
+			std::vector<float> faceTexCoords = it->second.getBackFaceTexCoords();
+			texCoords.insert(texCoords.end(), faceTexCoords.begin(), faceTexCoords.end());
 		}
 		// Bottom face
 		if (!findBlockDataKey(std::vector<int>{x, y-1, z}))
 		{
-			// Render, add 6 indices
-			indices.push_back(it->second.indices[30]+24*i);
-			indices.push_back(it->second.indices[31]+24*i);
-			indices.push_back(it->second.indices[32]+24*i);
-			indices.push_back(it->second.indices[33]+24*i);
-			indices.push_back(it->second.indices[34]+24*i);
-			indices.push_back(it->second.indices[35]+24*i);
+			std::vector<float> faceVerts = it->second.getBottomFaceVertices();
+			vertices.insert(vertices.end(), faceVerts.begin(), faceVerts.end());
+			
+			std::vector<float> faceTexCoords = it->second.getBottomFaceTexCoords();
+			texCoords.insert(texCoords.end(), faceTexCoords.begin(), faceTexCoords.end());
 		}
-
-		i++;
 	}
 }
 
@@ -212,7 +180,6 @@ Chunk::Chunk(int x, int z)
             for (int j=0; j<16; j++)
             {
                 blockData[std::vector<int>{i+16*x, j, k+16*z}] = Block(i+16*x, j, k+16*z);
-                blockData[std::vector<int>{i+16*x, j, k+16*z}].setTextureCoords(512, 512, 0, 0, 16, 16); // Change this when block class implemented
                 index++;
             }
         }
@@ -222,7 +189,6 @@ Chunk::Chunk(int x, int z)
     // Construct mesh on generation
 	// Pre-allocate memory for testing
 	vertices.reserve(16*16*16*24*3);
-	indices.reserve(16 * 16 * 16 * 36);
 	texCoords.reserve(16 * 16 * 16 * 24*3);
 	mesh();
 	double meshTime = glfwGetTime();

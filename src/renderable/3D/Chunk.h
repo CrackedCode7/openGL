@@ -19,11 +19,9 @@ class Chunk
 		unsigned int VAO;
 		unsigned int vertexVBO;
 		unsigned int textureVBO;
-		unsigned int EBO;
 		
 		// Buffer data storage attributes
         std::vector<float> vertices;
-        std::vector<unsigned int> indices;
         std::vector<float> texCoords;
 		
 		// Functions for loading/unloading (buffer creation/deletion)

@@ -60,9 +60,9 @@ int main()
 	// Create chunks
 	std::map<std::vector<int>, Chunk> chunks;
 	std::vector<Chunk*> loadedChunks;
-	for (int i=-3; i<=3; i++)
+	for (int i=-5; i<=5; i++)
 	{
-		for (int j=-3; j<=3; j++)
+		for (int j=-5; j<=5; j++)
 		{
 			chunks[std::vector<int>{i, j}] = Chunk (i, j);
 			loadedChunks.push_back(&chunks[std::vector<int>{i, j}]);
