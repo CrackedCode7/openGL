@@ -4,6 +4,8 @@
 #include <GLFW/glfw3.h> // glfwGetTime()
 #include <map>
 #include <vector>
+#include <string>
+#include <fstream>
 #include "Block.h"
 #include "src/util/util.h"
 
@@ -14,6 +16,9 @@ void Chunk::load()
 {
 	// Update chunk state
 	loaded = true;
+	
+	// Re-mesh chunk
+	//mesh();
 
 	// Set up OpenGL buffers
 	glGenBuffers(1, &vertexVBO);
@@ -47,6 +52,7 @@ void Chunk::load()
 
 void Chunk::unload()
 {
+	std::cout << "Unloaded chunk " << x << "," << z << std::endl;
 	// Update chunk state
 	loaded = false;
 	
@@ -66,6 +72,41 @@ void Chunk::unload()
 	// Their values are set to 0, which means it is not a buffer object.
 	glDeleteBuffers(1, &vertexVBO);
 	glDeleteBuffers(1, &textureVBO);
+	
+	// Save chunk data to file
+	save();
+}
+
+
+void Chunk::save()
+{
+	// Current file format is as follows:
+	// - 4-byte integer x, 4-byte integer z, 4-byte integer size (number of blocks)
+	//   then the remaining data are the blocks positions in order. (x, y, z) each
+	//   a 4-byte integer
+	
+	std::string filename = "chunks/" + std::to_string(x) + "." + std::to_string(z) + ".chunk";
+	
+	std::ofstream outFile;
+	outFile.open(filename, std::ios::out | std::ios::binary);
+	
+	// Chunk position data
+	outFile.write(reinterpret_cast<const char*>(&x), sizeof(x));
+	outFile.write(reinterpret_cast<const char*>(&z), sizeof(z));
+	
+	// Chunk block data size
+	int size = blockData.size();
+	outFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
+	
+	// Chunk block data
+	for (int i=0; i<size; i++)
+	{
+		outFile.write(reinterpret_cast<const char*>(&blockData[i].x), sizeof(blockData[i].x));
+		outFile.write(reinterpret_cast<const char*>(&blockData[i].y), sizeof(blockData[i].y));
+		outFile.write(reinterpret_cast<const char*>(&blockData[i].z), sizeof(blockData[i].z));
+	}
+	
+	outFile.close();
 }
 
 
@@ -102,8 +143,21 @@ bool Chunk::findBlock(int x, int y, int z)
 }
 
 
+void Chunk::addToVector(std::vector<float>& original, std::vector<float>& itemsToAdd)
+{
+	for (int i=0; i<itemsToAdd.size(); i++)
+	{
+		original.push_back(itemsToAdd[i]);
+	}
+}
+
+
 void Chunk::mesh()
 {
+	// Clear data before meshing
+	vertices.clear();
+	texCoords.clear();
+	
     for (int i=0; i<blockData.size(); i++)
 	{
 		// key is first, block is second
@@ -116,55 +170,55 @@ void Chunk::mesh()
 		if (!findBlock(x, y, z+1))
 		{
 			std::vector<float> faceVerts = blockData[i].getFrontFaceVertices();
-			vertices.insert(vertices.end(), faceVerts.begin(), faceVerts.end());
+			addToVector(vertices, faceVerts);
 			
 			std::vector<float> faceTexCoords = blockData[i].getFrontFaceTexCoords();
-			texCoords.insert(texCoords.end(), faceTexCoords.begin(), faceTexCoords.end());
+			addToVector(texCoords, faceTexCoords);
 		}
 		// Right face
 		if (!findBlock(x+1, y, z))
 		{
 			std::vector<float> faceVerts = blockData[i].getRightFaceVertices();
-			vertices.insert(vertices.end(), faceVerts.begin(), faceVerts.end());
+			addToVector(vertices, faceVerts);
 			
 			std::vector<float> faceTexCoords = blockData[i].getRightFaceTexCoords();
-			texCoords.insert(texCoords.end(), faceTexCoords.begin(), faceTexCoords.end());
+			addToVector(texCoords, faceTexCoords);
 		}
 		// Top face
 		if (!findBlock(x, y+1, z))
 		{
 			std::vector<float> faceVerts = blockData[i].getTopFaceVertices();
-			vertices.insert(vertices.end(), faceVerts.begin(), faceVerts.end());
+			addToVector(vertices, faceVerts);
 			
 			std::vector<float> faceTexCoords = blockData[i].getTopFaceTexCoords();
-			texCoords.insert(texCoords.end(), faceTexCoords.begin(), faceTexCoords.end());
+			addToVector(texCoords, faceTexCoords);
 		}
 		// Left face
 		if (!findBlock(x-1, y, z))
 		{
 			std::vector<float> faceVerts = blockData[i].getLeftFaceVertices();
-			vertices.insert(vertices.end(), faceVerts.begin(), faceVerts.end());
+			addToVector(vertices, faceVerts);
 			
 			std::vector<float> faceTexCoords = blockData[i].getLeftFaceTexCoords();
-			texCoords.insert(texCoords.end(), faceTexCoords.begin(), faceTexCoords.end());
+			addToVector(texCoords, faceTexCoords);
 		}
 		// Back face
 		if (!findBlock(x, y, z-1))
 		{
 			std::vector<float> faceVerts = blockData[i].getBackFaceVertices();
-			vertices.insert(vertices.end(), faceVerts.begin(), faceVerts.end());
+			addToVector(vertices, faceVerts);
 			
 			std::vector<float> faceTexCoords = blockData[i].getBackFaceTexCoords();
-			texCoords.insert(texCoords.end(), faceTexCoords.begin(), faceTexCoords.end());
+			addToVector(texCoords, faceTexCoords);
 		}
 		// Bottom face
 		if (!findBlock(x, y-1, z))
 		{
 			std::vector<float> faceVerts = blockData[i].getBottomFaceVertices();
-			vertices.insert(vertices.end(), faceVerts.begin(), faceVerts.end());
+			addToVector(vertices, faceVerts);
 			
 			std::vector<float> faceTexCoords = blockData[i].getBottomFaceTexCoords();
-			texCoords.insert(texCoords.end(), faceTexCoords.begin(), faceTexCoords.end());
+			addToVector(texCoords, faceTexCoords);
 		}
 	}
 }
@@ -178,6 +232,15 @@ Chunk::Chunk(int x, int z)
     this -> x = x;
     this -> z = z;
 	
+	// Attempt to read chunk contents from file
+	std::string filename = "chunks/" + std::to_string(x) + "." + std::to_string(z) + ".chunk";
+	std::ifstream check(filename);
+	if (check.good())
+	{
+		std::cout << "Found chunk file for chunk " << x << "," << z << std::endl;
+	}
+	
+	// Generate chunk data if file not found for chunk
 	double startTime = glfwGetTime();
     // Generate blocks
     int index = 0;
@@ -187,7 +250,7 @@ Chunk::Chunk(int x, int z)
         {
             for (int i=0; i<xSize; i++)
             {
-                blockData.push_back(Block(i+16*x, j, k+16*z));
+                blockData.push_back(Block(i+xSize*x, j, k+zSize*z));
                 index++;
             }
         }
@@ -206,7 +269,7 @@ Chunk::Chunk(int x, int z)
 	load();
 	double loadTime = glfwGetTime();
 	
-	std::cout << "Generating chunk took " << genTime-startTime << std::endl;
-	std::cout << "Generating mesh took " << meshTime-genTime << std::endl;
-	std::cout << "Loading chunk took " << loadTime-meshTime << std::endl;
+	std::cout << "Generating chunk " << x << "," << z << " took " << genTime-startTime << std::endl;
+	std::cout << "Generating mesh for chunk " << x << "," << z << " took " << meshTime-genTime << std::endl;
+	std::cout << "Loading chunk " << x << "," << z << " took " << loadTime-meshTime << std::endl;
 }

@@ -27,12 +27,14 @@ class Chunk
         std::vector<float> vertices;
         std::vector<float> texCoords;
 		
-		// Functions for loading/unloading (buffer creation/deletion)
+		// Functions for loading/unloading and saving to file
 		void load();
 		void unload();
+		void save();
 		
-		// Meshing function
+		// Meshing functions
 		void mesh();
+		void addToVector(std::vector<float>& original, std::vector<float>& itemsToAdd);
 		bool findBlock(int x, int y, int z);
 		
 		// Drawing function

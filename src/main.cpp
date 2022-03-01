@@ -16,6 +16,7 @@
 #include "src/renderable/2D/text.h"
 #include "src/textures/Texture.h"
 #include "src/renderable/3D/Chunk.h"
+#include "src/renderable/3D/ChunkManager.h"
 #include "src/UI/debugScreen.h"
 #include "src/setup/GLFW/windowSetup.h"
 
@@ -55,19 +56,7 @@ int main()
 	// -----------------------------------------------------------------------------
 	// Load texture atlas
 	Texture texture("src/textures/textures.png");
-
-
-	// Create chunks
-	std::map<std::vector<int>, Chunk> chunks;
-	std::vector<Chunk*> loadedChunks;
-	for (int i=-5; i<=5; i++)
-	{
-		for (int j=-5; j<=5; j++)
-		{
-			chunks[std::vector<int>{i, j}] = Chunk (i, j);
-			loadedChunks.push_back(&chunks[std::vector<int>{i, j}]);
-		}
-	}
+	
 	
 	// Define UI elements
 	// FPS counter initializes to "XXXX", updated in tick/frame loop later.
@@ -83,8 +72,24 @@ int main()
 	Camera camera(0.0f, 20.0f, -5.0f, window::SCR_WIDTH, window::SCR_HEIGHT);
 	int lastPlayerChunkX = (int)floor(camera.cameraPos[0]);
 	int playerChunkX = (int)floor(camera.cameraPos[0]);
-	int lastPlayerChunkZ = (int)floor(camera.cameraPos[1]);
-	int playerChunkZ = (int)floor(camera.cameraPos[1]);
+	int lastPlayerChunkZ = (int)floor(camera.cameraPos[2] / 16);
+	int playerChunkZ = (int)floor(camera.cameraPos[2] / 16);
+
+	
+	// Create chunk storage, define constants
+	int renderDistance = 12;
+	ChunkManager chunkManager(renderDistance);
+	chunkManager.updateChunksToRender(playerChunkX, playerChunkZ);
+	//std::map<std::vector<int>, Chunk> chunks;
+	//std::vector<Chunk*> loadedChunks;
+	/*for (int i=-renderDistance; i<=renderDistance; i++)
+	{
+		for (int j=-renderDistance; j<=renderDistance; j++)
+		{
+			chunks[std::vector<int>{i, j}] = Chunk (i, j);
+			loadedChunks.push_back(&chunks[std::vector<int>{i, j}]);
+		}
+	}*/
 
 
 	// OpenGL setup functions
@@ -160,6 +165,8 @@ int main()
 				lastPlayerChunkX = playerChunkX;
 				lastPlayerChunkZ = playerChunkZ;
 				
+				chunkManager.updateChunksToRender(playerChunkX, playerChunkZ);
+				/*
 				for (int i=0; i<loadedChunks.size(); i++)
 				{
 					if (sqrt(pow((loadedChunks[i]->x-lastPlayerChunkX), 2) + pow((loadedChunks[i]->z-lastPlayerChunkZ), 2)) >= 5)
@@ -170,7 +177,7 @@ int main()
 					{
 						loadedChunks[i] -> load();
 					}
-				}
+				}*/
 			}
 
 
@@ -196,9 +203,9 @@ int main()
 		// Bind Texture (texture uniform, frag shader)
 		glBindTexture(GL_TEXTURE_2D, texture.texture);
 		// Draw 3D
-		for (int i = 0; i<loadedChunks.size(); i++)
+		for (int i = 0; i<chunkManager.chunks.size(); i++)
 		{
-			loadedChunks[i] -> draw();
+			chunkManager.chunks[i].draw();
 		}
 		
 		// Draw UI
