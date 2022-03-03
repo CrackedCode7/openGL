@@ -4,6 +4,7 @@
 
 #include <map>
 #include <vector>
+#include <fstream>
 
 
 class Chunk
@@ -31,6 +32,7 @@ class Chunk
 		void load();
 		void unload();
 		void save();
+		void generateBlocksFromFile(std::ifstream &file);
 		
 		// Meshing functions
 		void mesh();

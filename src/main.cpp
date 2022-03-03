@@ -77,7 +77,7 @@ int main()
 
 	
 	// Create chunk storage, define constants
-	int renderDistance = 12;
+	int renderDistance = 5;
 	ChunkManager chunkManager(renderDistance);
 	chunkManager.updateChunksToRender(playerChunkX, playerChunkZ);
 	//std::map<std::vector<int>, Chunk> chunks;

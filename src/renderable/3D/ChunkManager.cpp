@@ -55,8 +55,10 @@ void ChunkManager::updateChunksToRender(int playerChunkX, int playerChunkZ)
 		}
 	}
 	
+	// Sort indices greatest to largest to remove all at once
 	std::sort(indicesToRemove.begin(), indicesToRemove.end(), std::greater<int>());
 	
+	// Erase chunks
 	for (int i=0; i<indicesToRemove.size(); i++)
 	{
 		chunks.erase(chunks.begin() + indicesToRemove[i]);

@@ -1,1 +1,5 @@
 .vscode/settings.json
+chunks/
+testing/
+glfw-binaries/
+examples/

@@ -7,24 +7,72 @@
 #include <string>
 #include <fstream>
 #include <cstring>
+#include <iterator>
 #include "Block.h"
 #include "src/util/util.h"
 
 #include <iostream>
 
 
+void Chunk::generateBlocksFromFile(std::ifstream &file)
+{
+	// Check to make sure file is open
+	if (file.is_open())
+	{
+		// Get file size
+		std::streampos fileSize;
+		file.seekg(0, std::ios::end); // go to end of file
+		fileSize = file.tellg(); // read position
+		file.seekg(0, std::ios::beg); // reset to beginning of file
+		
+		// Read into vector
+		std::vector<unsigned char> data;
+		data.reserve(fileSize);
+		data.insert(data.begin(),
+				    std::istream_iterator<unsigned char>(file),
+				    std::istream_iterator<unsigned char>());
+		
+		int index = 0;
+		
+		// Extract "x" integer
+		int chunkX = integerFromBytes(data, index);
+		index += 4;
+		
+		// Extract "z" integer
+		int chunkZ = integerFromBytes(data, index);
+		index += 4;
+		
+		// Check to make sure we are reading correct chunk, implement this as class func
+		// to get access to class variables.
+		
+		// Extract size
+		int size = integerFromBytes(data, index);
+		index += 4;
+		
+		// Get block positions
+		for (int i = 0; i < size; i++)
+		{
+			int x = integerFromBytes(data, index);
+			index += 4;
+			int y = integerFromBytes(data, index);
+			index += 4;
+			int z = integerFromBytes(data, index);
+			index += 4;
+			
+			blockData.push_back(Block(x, y, z));
+		}
+	}
+}
+
+
 void Chunk::load()
 {
 	// Update chunk state
 	loaded = true;
-	
-	// Re-mesh chunk
-	//mesh();
 
 	// Set up OpenGL buffers
 	glGenBuffers(1, &vertexVBO);
 	glGenBuffers(1, &textureVBO);
-	//glGenBuffers(1, &EBO);
 	
 	// VAO bound before setting up buffer data
 	glBindVertexArray(VAO);
@@ -110,8 +158,6 @@ void Chunk::save()
 		outFile.write(reinterpret_cast<char*>(&blockData[i].y), sizeof(blockData[i].y));
 		outFile.write(reinterpret_cast<char*>(&blockData[i].z), sizeof(blockData[i].z));
 	}
-	// NOT WORKING CORRECTLY, size not right
-	//outFile.write((char*)&outData[0], outData.size());
 	
 	outFile.close();
 }
@@ -239,29 +285,38 @@ Chunk::Chunk(int x, int z)
     this -> x = x;
     this -> z = z;
 	
+	double startTime = glfwGetTime();
+	
 	// Attempt to read chunk contents from file
 	std::string filename = "chunks/" + std::to_string(x) + "." + std::to_string(z) + ".chunk";
-	std::ifstream check(filename);
-	if (check.good())
+	std::ifstream chunkFile(filename, std::ios::binary);
+	chunkFile.unsetf(std::ios::skipws); // don't eat newlines
+	if (chunkFile.is_open())
 	{
 		std::cout << "Found chunk file for chunk " << x << "," << z << std::endl;
+		
+		generateBlocksFromFile(chunkFile);
+		
+		chunkFile.close();
 	}
 	
-	// Generate chunk data if file not found for chunk
-	double startTime = glfwGetTime();
-    // Generate blocks
-    int index = 0;
-    for (int j=0; j<ySize; j++)
-    {
-        for (int k=0; k<zSize; k++)
-        {
-            for (int i=0; i<xSize; i++)
-            {
-                blockData.push_back(Block(i+xSize*x, j, k+zSize*z));
-                index++;
-            }
-        }
-    }
+	else
+	{
+		// Generate chunk data if file not found for chunk
+		// Generate blocks
+		int index = 0;
+		for (int j=0; j<ySize; j++)
+		{
+			for (int k=0; k<zSize; k++)
+			{
+				for (int i=0; i<xSize; i++)
+				{
+					blockData.push_back(Block(i+xSize*x, j, k+zSize*z));
+					index++;
+				}
+			}
+		}
+	}
 	double genTime = glfwGetTime();
 
     // Construct mesh on generation
@@ -278,5 +333,5 @@ Chunk::Chunk(int x, int z)
 	
 	std::cout << "Generating chunk " << x << "," << z << " took " << genTime-startTime << std::endl;
 	std::cout << "Generating mesh for chunk " << x << "," << z << " took " << meshTime-genTime << std::endl;
-	std::cout << "Loading chunk " << x << "," << z << " took " << loadTime-meshTime << std::endl;
+	std::cout << "Loading chunk " << x << "," << z << " took " << loadTime-meshTime << "\n" << std::endl;
 }

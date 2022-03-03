@@ -11,4 +11,4 @@ float yPixelToScreenCoords(float yPixel, float yScreenSize);
 
 int positiveModulo(int x, int N);
 
-std::vector<unsigned char> integerToChar(int num);
+int integerFromBytes(std::vector<unsigned char> &input, int offset);

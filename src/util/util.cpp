@@ -21,14 +21,10 @@ int positiveModulo(int x, int N)
 }
 
 
-std::vector<unsigned char> integerToChar(int num)
+int integerFromBytes(std::vector<unsigned char> &input, int offset)
 {
-	std::vector<unsigned char> bytes;
-	
-	bytes.push_back((num >> 24) & 0xFF);
-	bytes.push_back((num >> 16) & 0xFF);
-	bytes.push_back((num >> 8) & 0xFF);
-	bytes.push_back(num & 0xFF);
-	
-	return bytes;
+	return int((input[3+offset]) << 24 |
+			   (input[2+offset]) << 16 |
+			   (input[1+offset]) << 8 |
+			   (input[0+offset]));
 }

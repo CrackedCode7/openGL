@@ -1,0 +1,22 @@
+Finish loading from file. DONE, but slower than regular. 0.01 versus
+0.001, 10x slower.
+
+Main thread with chunk manager tells thread pool that a chunk needs to
+be loaded and meshed.
+The thread pool can separately load and mesh the chunk, taking
+references to all loaded chunks. If an adjacent chunk isn't loaded, 
+then we just mesh interior faces (this is what should happen).
+Once thread is done, it tells the main thread and then the chunk can
+be added to the loaded chunks.
+We can also add in the fact that since it is now loaded, the adjacent 
+chunks that are loaded can be re-meshed to cull out interior faces.
+Potentially if multithreading does not fix things entirely we can
+look into two meshers, a dumb/fast mesher that runs slower on gpu
+and then a good/slow mesher that runs faster on gpu.
+Make sure to unload/load gpu on main thread. So when the thread to load
+or unload is done with cpu, it tells the main thread to unload/load.
+I think gpu should be unloaded first, then cpu unloaded.
+For cpu, load cpu first, then load gpu and draw.
+There is concurrency thread function to get max on the system, use this
+so it runs appropriately on different hardware and we have different 
+number of worker threads.
