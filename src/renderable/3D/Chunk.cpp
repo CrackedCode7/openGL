@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <cstring>
 #include "Block.h"
 #include "src/util/util.h"
 
@@ -52,7 +53,8 @@ void Chunk::load()
 
 void Chunk::unload()
 {
-	std::cout << "Unloaded chunk " << x << "," << z << std::endl;
+	double startTime = glfwGetTime();
+	
 	// Update chunk state
 	loaded = false;
 	
@@ -75,6 +77,9 @@ void Chunk::unload()
 	
 	// Save chunk data to file
 	save();
+	
+	double endTime = glfwGetTime();
+	std::cout << "Unloaded chunk " << x << "," << z << " in " << endTime - startTime << std::endl;
 }
 
 
@@ -90,21 +95,23 @@ void Chunk::save()
 	std::ofstream outFile;
 	outFile.open(filename, std::ios::out | std::ios::binary);
 	
-	// Chunk position data
-	outFile.write(reinterpret_cast<const char*>(&x), sizeof(x));
-	outFile.write(reinterpret_cast<const char*>(&z), sizeof(z));
+	// Chunk position
+	outFile.write(reinterpret_cast<char*>(&x), sizeof(x));
+	outFile.write(reinterpret_cast<char*>(&z), sizeof(z));
 	
 	// Chunk block data size
 	int size = blockData.size();
-	outFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
+	outFile.write(reinterpret_cast<char*>(&size), sizeof(size));
 	
 	// Chunk block data
 	for (int i=0; i<size; i++)
 	{
-		outFile.write(reinterpret_cast<const char*>(&blockData[i].x), sizeof(blockData[i].x));
-		outFile.write(reinterpret_cast<const char*>(&blockData[i].y), sizeof(blockData[i].y));
-		outFile.write(reinterpret_cast<const char*>(&blockData[i].z), sizeof(blockData[i].z));
+		outFile.write(reinterpret_cast<char*>(&blockData[i].x), sizeof(blockData[i].x));
+		outFile.write(reinterpret_cast<char*>(&blockData[i].y), sizeof(blockData[i].y));
+		outFile.write(reinterpret_cast<char*>(&blockData[i].z), sizeof(blockData[i].z));
 	}
+	// NOT WORKING CORRECTLY, size not right
+	//outFile.write((char*)&outData[0], outData.size());
 	
 	outFile.close();
 }
