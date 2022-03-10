@@ -80,16 +80,6 @@ int main()
 	int renderDistance = 5;
 	ChunkManager chunkManager(renderDistance);
 	chunkManager.updateChunksToRender(playerChunkX, playerChunkZ);
-	//std::map<std::vector<int>, Chunk> chunks;
-	//std::vector<Chunk*> loadedChunks;
-	/*for (int i=-renderDistance; i<=renderDistance; i++)
-	{
-		for (int j=-renderDistance; j<=renderDistance; j++)
-		{
-			chunks[std::vector<int>{i, j}] = Chunk (i, j);
-			loadedChunks.push_back(&chunks[std::vector<int>{i, j}]);
-		}
-	}*/
 
 
 	// OpenGL setup functions
@@ -166,18 +156,6 @@ int main()
 				lastPlayerChunkZ = playerChunkZ;
 				
 				chunkManager.updateChunksToRender(playerChunkX, playerChunkZ);
-				/*
-				for (int i=0; i<loadedChunks.size(); i++)
-				{
-					if (sqrt(pow((loadedChunks[i]->x-lastPlayerChunkX), 2) + pow((loadedChunks[i]->z-lastPlayerChunkZ), 2)) >= 5)
-					{
-						loadedChunks[i] -> unload();
-					}
-					else if (!loadedChunks[i] -> loaded)
-					{
-						loadedChunks[i] -> load();
-					}
-				}*/
 			}
 
 

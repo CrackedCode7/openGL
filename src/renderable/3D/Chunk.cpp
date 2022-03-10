@@ -14,6 +14,25 @@
 #include <iostream>
 
 
+void Chunk::generate()
+{
+	// Generate chunk data if file not found for chunk
+	// Generate blocks
+	int index = 0;
+	for (int j = 0; j < ySize; j++)
+	{
+		for (int k = 0; k < zSize; k++)
+		{
+			for (int i = 0; i < xSize; i++)
+			{
+				blockData.push_back(Block(i + xSize * x, j, k + zSize * z));
+				index++;
+			}
+		}
+	}
+}
+
+
 void Chunk::generateBlocksFromFile(std::ifstream &file)
 {
 	// Check to make sure file is open
@@ -65,10 +84,13 @@ void Chunk::generateBlocksFromFile(std::ifstream &file)
 }
 
 
-void Chunk::load()
+void Chunk::loadGPU()
 {
 	// Update chunk state
 	loaded = true;
+
+	// Create VAO on chunk creation
+	glGenVertexArrays(1, &VAO);
 
 	// Set up OpenGL buffers
 	glGenBuffers(1, &vertexVBO);
@@ -99,7 +121,7 @@ void Chunk::load()
 }
 
 
-void Chunk::unload()
+void Chunk::unloadGPU()
 {
 	double startTime = glfwGetTime();
 	
@@ -122,9 +144,6 @@ void Chunk::unload()
 	// Their values are set to 0, which means it is not a buffer object.
 	glDeleteBuffers(1, &vertexVBO);
 	glDeleteBuffers(1, &textureVBO);
-	
-	// Save chunk data to file
-	save();
 	
 	double endTime = glfwGetTime();
 	std::cout << "Unloaded chunk " << x << "," << z << " in " << endTime - startTime << std::endl;
@@ -291,6 +310,7 @@ Chunk::Chunk(int x, int z)
 	std::string filename = "chunks/" + std::to_string(x) + "." + std::to_string(z) + ".chunk";
 	std::ifstream chunkFile(filename, std::ios::binary);
 	chunkFile.unsetf(std::ios::skipws); // don't eat newlines
+	
 	if (chunkFile.is_open())
 	{
 		std::cout << "Found chunk file for chunk " << x << "," << z << std::endl;
@@ -302,20 +322,7 @@ Chunk::Chunk(int x, int z)
 	
 	else
 	{
-		// Generate chunk data if file not found for chunk
-		// Generate blocks
-		int index = 0;
-		for (int j=0; j<ySize; j++)
-		{
-			for (int k=0; k<zSize; k++)
-			{
-				for (int i=0; i<xSize; i++)
-				{
-					blockData.push_back(Block(i+xSize*x, j, k+zSize*z));
-					index++;
-				}
-			}
-		}
+		generate();
 	}
 	double genTime = glfwGetTime();
 
@@ -323,12 +330,9 @@ Chunk::Chunk(int x, int z)
 	mesh();
 	double meshTime = glfwGetTime();
 	
-	// Create VAO on chunk creation
-	glGenVertexArrays(1, &VAO);
-	
 	// Load data into buffers for rendering
 	// Assumes that when a chunk is generated it should be ready to render
-	load();
+	loadGPU();
 	double loadTime = glfwGetTime();
 	
 	std::cout << "Generating chunk " << x << "," << z << " took " << genTime-startTime << std::endl;

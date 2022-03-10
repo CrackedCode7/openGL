@@ -29,10 +29,11 @@ class Chunk
         std::vector<float> texCoords;
 		
 		// Functions for loading/unloading and saving to file
-		void load();
-		void unload();
+		void loadGPU();
+		void unloadGPU();
 		void save();
 		void generateBlocksFromFile(std::ifstream &file);
+		void generate();
 		
 		// Meshing functions
 		void mesh();

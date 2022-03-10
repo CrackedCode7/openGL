@@ -4,6 +4,7 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
+#include <thread>
 
 
 ChunkManager::ChunkManager() {}
@@ -37,11 +38,22 @@ void ChunkManager::updateChunksToRender(int playerChunkX, int playerChunkZ)
 				// Add chunk if not loaded already
 				if (!isChunkLoaded)
 				{
-					chunks.push_back(Chunk(i, j));
+					std::thread t(&ChunkManager::generateChunk, this, i, j);
+					t.detach();
 				}
 			}
 		}
 	}
+	
+	// Load (create gpu portion) of chunks that have been generated
+	mtx.lock();
+	for (int i = 0; i < chunksToBeLoaded.size(); i++)
+	{
+		chunksToBeLoaded[i].loadGPU();
+		chunks.push_back(chunksToBeLoaded[i]);
+	}
+	chunksToBeLoaded.clear();
+	mtx.unlock();
 	
 	// Remove previously loaded chunks outside of render distance
 	std::vector<int> indicesToRemove;
@@ -50,7 +62,7 @@ void ChunkManager::updateChunksToRender(int playerChunkX, int playerChunkZ)
 		double chunkDistance = sqrt( pow(chunks[i].x - playerChunkX, 2) + pow(chunks[i].z - playerChunkZ, 2) );
 		if (chunkDistance > renderDistance)
 		{
-			chunks[i].unload();
+			chunks[i].unloadGPU();
 			indicesToRemove.push_back(i);
 		}
 	}
@@ -63,4 +75,15 @@ void ChunkManager::updateChunksToRender(int playerChunkX, int playerChunkZ)
 	{
 		chunks.erase(chunks.begin() + indicesToRemove[i]);
 	}
+}
+
+
+void ChunkManager::generateChunk(int x, int z)
+{
+	// Create chunk on cpu and add to chunk list
+	Chunk chunk = Chunk(x, z);
+
+	mtx.lock();
+	chunksToBeLoaded.push_back(chunk);
+	mtx.unlock();
 }
